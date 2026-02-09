@@ -1,14 +1,38 @@
+/*
+  Font notes:
+  - Kainos uses Foundry Gridnik and Galano Grotesque as primary brand fonts.
+  - These are typically licensed fonts — include them under `public/fonts/` if you have the files.
+  - If you don't have them, a good fallback is Inter (imported below) which we continue to include.
+
+  To self-host fonts, place font files in `public/fonts/` and add @font-face rules.
+  Recommended: convert OTF/TTF to WOFF2 for better performance.
+*/
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* Register Galano Grotesque weights using the OTF files you added. */
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueThin.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueThin.otf') format('opentype'); font-weight: 100; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueExtraLight.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueExtraLight.otf') format('opentype'); font-weight: 200; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueLight.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueLight.otf') format('opentype'); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueRegular.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueRegular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueMedium.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueMedium.otf') format('opentype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueSemiBold.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueSemiBold.otf') format('opentype'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueBold.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueBold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueExtraBold.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueExtraBold.otf') format('opentype'); font-weight: 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Galano Grotesque'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueBlack.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueBlack.otf') format('opentype'); font-weight: 900; font-style: normal; font-display: swap; }
+
+/* Alt variant family (optional) */
+@font-face { font-family: 'Galano Grotesque Alt'; src: url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueAltRegular.woff2') format('woff2'), url('/fonts/1716510270wpdm_galano-grotesque-alt/GalanoGrotesqueAltRegular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+
 :root {
-	--kainos-blue: #283583; /* Kainos blue */
-	--kainos-green: #61a83f; /* Kainos green */
-	--kainos-white: #ffffff;
-	--kainos-midblue: #41679f;
-	--kainos-darkgreen: #004631;
-	--kainos-grey: #575756;
-	--kainos-text: #111111;
-	--kainos-font: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+		--kainos-blue: #283583; /* Kainos blue */
+		--kainos-green: #61a83f; /* Kainos green */
+		--kainos-white: #ffffff;
+		--kainos-midblue: #41679f;
+		--kainos-darkgreen: #004631;
+		--kainos-grey: #575756;
+		--kainos-text: #111111;
+		--kainos-font: 'Foundry Gridnik', 'Galano Grotesque', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 body {
