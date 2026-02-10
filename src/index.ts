@@ -3,8 +3,6 @@ import nunjucks from "nunjucks";
 
 const app = express();
 
-app.use(express.static("public"));
-
 nunjucks.configure("templates", {
   autoescape: true,
   express: app,
