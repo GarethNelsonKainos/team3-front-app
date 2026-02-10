@@ -1,16 +1,19 @@
 :root {
-	--kainos-blue: #283583; /* Kainos blue */
-	--kainos-green: #61a83f; /* Kainos green */
-	--kainos-white: #ffffff;
-	--kainos-midblue: #41679f;
-	--kainos-darkgreen: #004631;
-	--kainos-grey: #575756;
-	--kainos-text: #111111;
-	--kainos-font: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+		--kainos-blue: #283583; /* Kainos blue */
+		--kainos-green: #61a83f; /* Kainos green */
+		--kainos-white: #ffffff;
+		--kainos-midblue: #41679f;
+		--kainos-darkgreen: #004631;
+		--kainos-grey: #575756;
+		--kainos-text: #111111;
+		--kainos-font: "Century Gothic";
 }
 
 body {
 	font-family: var(--kainos-font);
+	color: var(--kainos-text);
+	margin: 0;
+	font-family: "Century Gothic";
 	color: var(--kainos-text);
 	margin: 0;
 	background: var(--kainos-white);
