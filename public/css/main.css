@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 :root {
 	--kainos-blue: #283583; /* Kainos blue */
 	--kainos-green: #61a83f; /* Kainos green */
@@ -51,9 +49,9 @@ body {
 
 /* Stronger rule in case another stylesheet or inline styles override */
 .kainos-header .kainos-logo {
-	width: 200px !important;
-	height: 62px !important;
-	max-width: 100% !important;
+	width: 200px;
+	height: 62px;
+	max-width: 100%;
 }
 
 .site-title {
