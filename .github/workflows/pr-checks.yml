@@ -1,0 +1,30 @@
+name: PR Checks
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        types: [opened, synchronize]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Format code
+      run: npx @biomejs/biome format --write .
+
+    - name: Lint code
+      run: npx @biomejs/biome lint .
+
+    - name: Run tests
+      run: npm test
+
+    - name: Check coverage
+      run: npm run coverage

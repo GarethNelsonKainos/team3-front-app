@@ -11,7 +11,11 @@
     "coverage": "vitest --coverage",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "format": "biome format --write .",
+    "lint": "biome lint --write .",
+    "check": "biome check --write .",
+    "ci:check": "biome ci ."
   },
   "repository": {
     "type": "git",
@@ -25,9 +29,11 @@
   },
   "homepage": "https://github.com/GarethNelsonKainos/team3-front-app#readme",
   "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
     "@types/express": "^5.0.6",
     "@types/node": "^24.0.0",
     "@types/nunjucks": "^3.2.6",
+    "@vitest/coverage-v8": "^4.0.18",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^4.0.18"
