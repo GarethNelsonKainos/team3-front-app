@@ -1,25 +1,4 @@
-/* Kainos Brand Colour Palette */
-:root {
-  /* Primary Colours */
-  --kainos-blue: #283583;
-  --kainos-green: #61a83f;
-  --kainos-white: #ffffff;
-  --kainos-mid-blue: #41679f;
-  --kainos-dark-green: #004631;
-  --kainos-grey: #575756;
 
-  /* Secondary Colours */
-  --kainos-orange: #ec6608;
-  --kainos-bright-green: #cfd600;
-  --kainos-bright-blue: #009fe3;
-}
-
-/* Typography */
-body {
-  font-family: "Century Gothic", "Galano Grotesque", "Foundry Gridnik", sans-serif;
-  color: #575756;
-  background-color: #ffffff;
-}
 
 h1, h2, h3, h4, h5, h6 {
   color: #283583;
@@ -270,3 +249,86 @@ a:hover {
     font-size: 0.9rem;
   }
 }
+:root {
+		--kainos-blue: #283583; /* Kainos blue */
+		--kainos-green: #61a83f; /* Kainos green */
+		--kainos-white: #ffffff;
+		--kainos-midblue: #41679f;
+		--kainos-darkgreen: #004631;
+		--kainos-grey: #575756;
+		--kainos-text: #111111;
+		--kainos-font: "Century Gothic";
+}
+
+body {
+	font-family: var(--kainos-font);
+	color: var(--kainos-text);
+	margin: 0;
+	font-family: "Century Gothic";
+	color: var(--kainos-text);
+	margin: 0;
+	background: var(--kainos-white);
+}
+
+
+.kainos-header {
+	width: 100%;
+	border-bottom: 1px solid #eee;
+	background: linear-gradient(90deg, rgba(18,44,74,0.04), rgba(255,255,255,0));
+}
+
+/* inner container holds the alignment and padding */
+.kainos-header .header-inner {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 12px 20px;
+}
+
+.kainos-logo {
+	width: 200px;
+	height: 62px;
+	max-width: 100%;
+	display: block;
+}
+
+/* scale down on smaller screens */
+@media (max-width: 600px) {
+	.kainos-logo { width: 160px; height: 50px; }
+}
+
+@media (max-width: 380px) {
+	.kainos-logo { width: 120px; height: 38px; }
+}
+
+/* Stronger rule in case another stylesheet or inline styles override */
+.kainos-header .kainos-logo {
+	width: 200px;
+	height: 62px;
+	max-width: 100%;
+}
+
+.site-title {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: var(--kainos-blue);
+}
+
+.nav {
+	margin-left: auto;
+}
+
+.nav a {
+	color: var(--kainos-grey);
+	text-decoration: none;
+	margin-left: 12px;
+	font-weight: 600;
+}
+
+.nav a:hover { color: var(--kainos-blue); }
+
+.hero {
+	padding: 24px 20px;
+}
+
+.container { max-width: 980px; margin: 0 auto; }
