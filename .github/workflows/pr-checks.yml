@@ -17,11 +17,11 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Format code
-      run: npm run format
+    - name: Build the project
+      run: npm run build
 
-    - name: Lint code
-      run: npm run lint
+    - name: Check code (format, lint, import sorting)
+      run: npm run check
 
     - name: Run tests
       run: npm run test
