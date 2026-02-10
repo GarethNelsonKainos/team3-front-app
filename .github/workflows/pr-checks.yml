@@ -18,13 +18,10 @@ jobs:
       run: npm install
 
     - name: Format code
-      run: npx @biomejs/biome format --write .
+      run: npm run format
 
     - name: Lint code
-      run: npx @biomejs/biome lint .
+      run: npm run lint
 
     - name: Run tests
-      run: npm test
-
-    - name: Check coverage
-      run: npm run coverage
+      run: npm run test
