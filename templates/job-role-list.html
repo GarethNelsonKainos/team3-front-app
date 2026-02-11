@@ -5,42 +5,38 @@
     <title>Job roles</title>
     <link rel="icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/css/main.css" />
-    <style>
-      table { border-collapse: collapse; width: 100%; }
-      th, td { border: 1px solid #ddd; padding: 8px; }
-      th { background: #f4f4f4; text-align: left; }
-    </style>
   </head>
   <body>
     {% include "partials/header.html" %}
     <div class="container">
-    <h1>Open job roles</h1>
-    {% if roles && roles.length > 0 %}
-    <table>
-      <thead>
-        <tr>
-          <th>Role name</th>
-          <th>Location</th>
-          <th>Capability</th>
-          <th>Band</th>
-          <th>Closing date</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for role in roles %}
-        <tr>
-          <td>{{ role.roleName }}</td>
-          <td>{{ role.location or '-' }}</td>
-          <td>{{ role.capability or '-' }}</td>
-          <td>{{ role.band or '-' }}</td>
-          <td>{{ role.closingDate or '-' }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p>No open job roles found.</p>
-    {% endif %}
+      <h1>Open job roles</h1>
+      {% if roles and roles.length > 0 %}
+      <table class="job-roles-table">
+        <caption>List of currently open job roles</caption>
+        <thead>
+          <tr>
+            <th scope="col">Role name</th>
+            <th scope="col">Location</th>
+            <th scope="col">Capability</th>
+            <th scope="col">Band</th>
+            <th scope="col">Closing date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for role in roles %}
+          <tr>
+            <td>{{ role.roleName }}</td>
+            <td>{{ role.location or '-' }}</td>
+            <td>{{ role.capability or '-' }}</td>
+            <td>{{ role.band or '-' }}</td>
+            <td>{{ role.closingDate or '-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No open job roles found.</p>
+      {% endif %}
     </div>
   </body>
 </html>

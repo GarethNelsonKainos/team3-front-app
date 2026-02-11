@@ -8,6 +8,7 @@ router.get("/job-roles", async (req: Request, res: Response) => {
     const roles = await jobRoleService.getOpenJobRoles();
     res.render("job-role-list.html", { roles });
   } catch (err) {
+    console.error("Failed to load job roles", err);
     res.status(500).send("Failed to load job roles");
   }
 });

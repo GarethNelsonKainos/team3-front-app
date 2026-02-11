@@ -2,8 +2,12 @@ import jobRoleService, { JobRoleResponse } from "./jobRoleService";
 import axios from "axios";
 import { describe, it, expect, vi } from "vitest";
 
-vi.mock("axios");
-const mockedAxios = axios as any;
+vi.mock("axios", () => ({
+  default: {
+    get: vi.fn(),
+  },
+}));
+const mockedAxios = axios as unknown as { get: ReturnType<typeof vi.fn> };
 
 describe("getOpenJobRoles", () => {
   it("returns only open job roles", async () => {
