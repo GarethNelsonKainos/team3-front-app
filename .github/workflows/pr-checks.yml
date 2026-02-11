@@ -1,0 +1,27 @@
+name: PR Checks
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        types: [opened, synchronize]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the project
+      run: npm run build
+
+    - name: Check code (format, lint, import sorting)
+      run: npm run check
+
+    - name: Run tests
+      run: npm run test

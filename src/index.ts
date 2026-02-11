@@ -1,19 +1,17 @@
-import express, { Request, Response } from "express";
+import express, { type Request, type Response } from "express";
 import nunjucks from "nunjucks";
 
 const app = express();
 
-app.use(express.static("public"));
-
 nunjucks.configure("templates", {
-  autoescape: true,
-  express: app,
+	autoescape: true,
+	express: app,
 });
 
-app.get("/", (req: Request, res: Response) => {
-  res.render("index.html");
+app.get("/", (_req: Request, res: Response) => {
+	res.render("index.html");
 });
 
 app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+	console.log("Server running on http://localhost:3000");
 });
