@@ -364,3 +364,66 @@ body {
 	max-width: 980px;
 	margin: 0 auto;
 }
+
+.login-form {
+	margin-top: 20px;
+	padding: 20px;
+	border: 1px solid rgba(40, 53, 131, 0.15);
+	border-radius: 8px;
+	background: #f7f8fc;
+	max-width: 420px;
+}
+
+.login-form h2 {
+	margin: 0 0 16px;
+	color: var(--kainos-blue);
+}
+
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.form-field label {
+	font-weight: 600;
+	color: var(--kainos-grey);
+}
+
+.form-field input {
+	padding: 12px 14px;
+	border: 1px solid rgba(40, 53, 131, 0.25);
+	border-radius: 6px;
+	font-size: 1rem;
+	font-family: var(--kainos-font), sans-serif;
+}
+
+.form-field input:focus {
+	outline: 2px solid rgba(0, 159, 227, 0.4);
+	outline-offset: 2px;
+	border-color: #009fe3;
+}
+
+.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 12px 20px;
+	border: 0;
+	border-radius: 6px;
+	background: var(--kainos-blue);
+	color: var(--kainos-white);
+	font-weight: 600;
+	font-size: 1rem;
+	cursor: pointer;
+}
+
+.button:hover {
+	background: var(--kainos-midblue);
+}
+
+.button:focus-visible {
+	outline: 3px solid rgba(0, 159, 227, 0.45);
+	outline-offset: 2px;
+}

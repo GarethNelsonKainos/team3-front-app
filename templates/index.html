@@ -3,14 +3,41 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kainos - Home</title>
-    {% include "partials/linktags.html" %}
+    <title>Kainos Careers - Home</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
 <body>
   {% include "partials/header.html" %}  
   <div class="hero container">
-    <h1>Welcome to Kainos jobs</h1>
-    <p>View open roles across Kainos.</p>
+    <h1>Welcome to Kainos Careers</h1>
+    <p>Login to view open roles.</p>
+    <form class="login-form" action="#" method="post" aria-labelledby="login-title">
+      <h2 id="login-title">Login</h2>
+      <div class="form-field">
+        <label for="login-email">Email</label>
+        <input
+          type="email"
+          id="login-email"
+          name="email"
+          autocomplete="email"
+          required
+          inputmode="email"
+        >
+      </div>
+      <div class="form-field">
+        <label for="login-password">Password</label>
+        <input
+          type="password"
+          id="login-password"
+          name="password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+      <button type="submit" class="button">Log in</button>
+    </form>
   </div>
   {% include "partials/footer.html" %}
 </body>
