@@ -3,7 +3,7 @@ import jobRoleService from "../services/jobRoleService";
 
 const router = Router();
 
-router.get("/job-roles", async (req: Request, res: Response) => {
+router.get("/job-roles", async (_req: Request, res: Response) => {
 	try {
 		const roles = await jobRoleService.getOpenJobRoles();
 		res.render("job-role-list.html", { roles });
