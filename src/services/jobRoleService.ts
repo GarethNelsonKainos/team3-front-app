@@ -16,7 +16,7 @@ export async function getOpenJobRoles(): Promise<JobRoleResponse[]> {
   const url = `${API_BASE}/api/job-roles`;
   const resp = await axios.get<JobRoleResponse[]>(url);
   const data = resp.data || [];
-  return data.filter((r) => (r.status || "").toLowerCase() === "open");
+  return data.filter((r: JobRoleResponse) => (r.status || "").toLowerCase() === "open");
 }
 
 export default { getOpenJobRoles };
