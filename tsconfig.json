@@ -9,7 +9,7 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"outDir": "./dist",
-		"rootDir": "./src",
+		"rootDir": ".",
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true
