@@ -1,6 +1,6 @@
 import axios from "axios";
 import { describe, expect, it, vi } from "vitest";
-import jobRoleService, { type JobRoleResponse } from "./jobRoleService";
+import jobRoleService, { type JobRoleResponse } from "../src/services/jobRoleService";
 
 vi.mock("axios", () => ({
 	default: {
