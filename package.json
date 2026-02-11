@@ -1,39 +1,44 @@
 {
-  "name": "team3-front-app",
-  "version": "1.0.0",
-  "description": "Team 3 Frontend Application Feb/March 2026",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "coverage": "vitest --coverage",
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/GarethNelsonKainos/team3-front-app.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/GarethNelsonKainos/team3-front-app/issues"
-  },
-  "homepage": "https://github.com/GarethNelsonKainos/team3-front-app#readme",
-  "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^24.0.0",
-    "@types/nunjucks": "^3.2.6",
-    "tsx": "^4.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^4.0.18"
-  },
-  "dependencies": {
-    "express": "^5.2.1",
-    "nunjucks": "^3.2.4"
-  }
+	"name": "team3-front-app",
+	"version": "1.0.0",
+	"description": "Team 3 Frontend Application Feb/March 2026",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"test": "vitest",
+		"test:ui": "vitest --ui",
+		"coverage": "vitest --coverage",
+		"dev": "tsx watch src/index.ts",
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"format": "biome format .",
+		"lint": "biome lint .",
+		"check": "biome check ."
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/GarethNelsonKainos/team3-front-app.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/GarethNelsonKainos/team3-front-app/issues"
+	},
+	"homepage": "https://github.com/GarethNelsonKainos/team3-front-app#readme",
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.14",
+		"@types/express": "^5.0.6",
+		"@types/node": "^24.0.0",
+		"@types/nunjucks": "^3.2.6",
+		"@vitest/coverage-v8": "^4.0.18",
+		"tsx": "^4.0.0",
+		"typescript": "^5.0.0",
+		"vitest": "^4.0.18"
+	},
+	"dependencies": {
+		"express": "^5.2.1",
+		"nunjucks": "^3.2.4"
+	}
 }
