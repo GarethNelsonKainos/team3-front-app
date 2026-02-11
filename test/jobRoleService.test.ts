@@ -1,6 +1,7 @@
 import axios from "axios";
 import { describe, expect, it, vi } from "vitest";
 import jobRoleService, {
+	type JobRoleDetailedResponse,
 	type JobRoleResponse,
 } from "../src/services/jobRoleService";
 
@@ -32,5 +33,30 @@ describe("getOpenJobRoles", () => {
 		});
 		const result = await jobRoleService.getOpenJobRoles();
 		expect(result).toEqual([]);
+	});
+});
+
+describe("getJobRoleById", () => {
+	it("calls the detail endpoint and returns role data", async () => {
+		const mockRole: JobRoleDetailedResponse = {
+			jobRoleId: 123,
+			roleName: "Dev",
+			description: "Build things",
+			responsibilities: "Ship features",
+			sharepointUrl: "https://sharepoint.example/job-specs/123",
+			location: "Belfast",
+			capability: "Engineering",
+			band: "SSE",
+			closingDate: "2026-03-01",
+			status: "open",
+			numberOfOpenPositions: 2,
+		};
+
+		mockedAxios.get.mockResolvedValue({ data: mockRole });
+		const result = await jobRoleService.getJobRoleById(123);
+		expect(mockedAxios.get).toHaveBeenCalledWith(
+			"http://localhost:4000/api/job-roles/123",
+		);
+		expect(result).toEqual(mockRole);
 	});
 });

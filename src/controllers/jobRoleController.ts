@@ -13,4 +13,15 @@ router.get("/job-roles", async (_req: Request, res: Response) => {
 	}
 });
 
+router.get("/job-roles/:id", async (req: Request, res: Response) => {
+	try {
+		const id = String(req.params.id);
+		const role = await jobRoleService.getJobRoleById(id);
+		res.render("job-role-information.html", { role });
+	} catch (err) {
+		console.error("Failed to load job role", err);
+		res.status(500).send("Failed to load job role");
+	}
+});
+
 export default router;

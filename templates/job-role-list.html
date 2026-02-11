@@ -16,6 +16,7 @@
         <thead>
           <tr>
             <th scope="col">Role name</th>
+            <th scope="col">Specification</th>
             <th scope="col">Location</th>
             <th scope="col">Capability</th>
             <th scope="col">Band</th>
@@ -25,7 +26,20 @@
         <tbody>
           {% for role in roles %}
           <tr>
-            <td>{{ role.roleName }}</td>
+            <td>
+              {% if role.jobRoleId %}
+              <a href="/job-roles/{{ role.jobRoleId }}">{{ role.roleName }}</a>
+              {% else %}
+              {{ role.roleName }}
+              {% endif %}
+            </td>
+            <td>
+              {% if role.jobRoleId %}
+              <a href="/job-roles/{{ role.jobRoleId }}">View</a>
+              {% else %}
+              -
+              {% endif %}
+            </td>
             <td>{{ role.location or '-' }}</td>
             <td>{{ role.capability or '-' }}</td>
             <td>{{ role.band or '-' }}</td>
