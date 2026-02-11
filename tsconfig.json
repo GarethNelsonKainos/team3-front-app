@@ -9,11 +9,11 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"outDir": "./dist",
-		"rootDir": "./src",
+		"rootDir": ".",
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "test/jobRoleService.test.ts"],
 	"exclude": ["node_modules", "dist"]
 }

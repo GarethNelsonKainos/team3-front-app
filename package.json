@@ -29,6 +29,7 @@
 	"homepage": "https://github.com/GarethNelsonKainos/team3-front-app#readme",
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.14",
+		"@types/axios": "^0.9.36",
 		"@types/express": "^5.0.6",
 		"@types/node": "^24.0.0",
 		"@types/nunjucks": "^3.2.6",
@@ -38,6 +39,7 @@
 		"vitest": "^4.0.18"
 	},
 	"dependencies": {
+		"axios": "^1.13.5",
 		"express": "^5.2.1",
 		"nunjucks": "^3.2.4"
 	}
