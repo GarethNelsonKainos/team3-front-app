@@ -366,7 +366,11 @@ body {
 }
 
 .page-hero {
-	background: linear-gradient(120deg, rgba(40, 53, 131, 0.12), rgba(97, 168, 63, 0.12));
+	background: linear-gradient(
+		120deg,
+		rgba(40, 53, 131, 0.12),
+		rgba(97, 168, 63, 0.12)
+	);
 	padding: 32px 0 24px;
 	border-bottom: 1px solid rgba(40, 53, 131, 0.12);
 }
@@ -467,7 +471,11 @@ body {
 }
 
 .cta-button {
-	background: linear-gradient(120deg, var(--kainos-blue), var(--kainos-midblue));
+	background: linear-gradient(
+		120deg,
+		var(--kainos-blue),
+		var(--kainos-midblue)
+	);
 	color: #ffffff;
 	border: none;
 	padding: 12px 20px;

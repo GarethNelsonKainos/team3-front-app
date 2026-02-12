@@ -1,27 +1,28 @@
+import path from "node:path";
 import express from "express";
 import nunjucks from "nunjucks";
-import path from "node:path";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import jobRoleService from "../src/services/jobRoleService";
 import jobRoleController from "../src/controllers/jobRoleController";
+import jobRoleService from "../src/services/jobRoleService";
+
 // Mock data for all tests
 const mockRoles = [
-  { jobRoleId: 1, roleName: "Dev", status: "open" },
-  { jobRoleId: 2, roleName: "QA", status: "open" },
+	{ jobRoleId: 1, roleName: "Dev", status: "open" },
+	{ jobRoleId: 2, roleName: "QA", status: "open" },
 ];
 const mockRoleDetail = {
-  jobRoleId: 1,
-  roleName: "Dev",
-  description: "Build things",
-  responsibilities: "Ship features",
-  sharepointUrl: "https://sharepoint.example/job-specs/1",
-  location: "Belfast",
-  capability: "Engineering",
-  band: "SSE",
-  closingDate: "2026-03-01",
-  status: "open",
-  numberOfOpenPositions: 2,
+	jobRoleId: 1,
+	roleName: "Dev",
+	description: "Build things",
+	responsibilities: "Ship features",
+	sharepointUrl: "https://sharepoint.example/job-specs/1",
+	location: "Belfast",
+	capability: "Engineering",
+	band: "SSE",
+	closingDate: "2026-03-01",
+	status: "open",
+	numberOfOpenPositions: 2,
 };
 
 vi.mock("../src/services/jobRoleService");
