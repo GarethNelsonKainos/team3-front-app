@@ -3,7 +3,7 @@ import { validateLogin } from "../utils/login";
 
 const router = Router();
 
-router.get("/login", async (_req: Request, res: Response) => {
+router.get("/login", (_req: Request, res: Response) => {
 	try {
 		res.render("login.html");
 	} catch (err) {
