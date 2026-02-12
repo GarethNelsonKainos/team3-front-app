@@ -24,4 +24,26 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 	}
 });
 
+router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
+	try {
+		const id = String(req.params.id);
+		const role = await jobRoleService.getJobRoleById(id);
+		res.render("job-role-apply.html", { role, submitted: false });
+	} catch (err) {
+		console.error("Failed to load apply page", err);
+		res.status(500).send("Failed to load apply page");
+	}
+});
+
+router.post("/job-roles/:id/apply", async (req: Request, res: Response) => {
+	try {
+		const id = String(req.params.id);
+		const role = await jobRoleService.getJobRoleById(id);
+		res.render("job-role-apply.html", { role, submitted: true });
+	} catch (err) {
+		console.error("Failed to submit application", err);
+		res.status(500).send("Failed to submit application");
+	}
+});
+
 export default router;

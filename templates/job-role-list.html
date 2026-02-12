@@ -2,55 +2,66 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Job roles</title>
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="stylesheet" href="/css/main.css" />
+    {% include "partials/linktags.html" %}
   </head>
   <body>
     {% include "partials/header.html" %}
-    <div class="container">
-      <h1>Open job roles</h1>
+    <section class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Careers</p>
+        <h1 class="page-hero__title">Open job roles</h1>
+        <p class="page-hero__subtitle">Find a role that matches your skills and ambition.</p>
+      </div>
+    </section>
+    <div class="container page-section">
       {% if roles and roles.length > 0 %}
-        <table class="job-roles-table">
-          <caption>List of currently open job roles</caption>
-          <thead>
-            <tr>
-              <th scope="col">Role name</th>
-              <th scope="col">Specification</th>
-              <th scope="col">Location</th>
-              <th scope="col">Capability</th>
-              <th scope="col">Band</th>
-              <th scope="col">Closing date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for role in roles %}
+        <div class="page-card">
+          <table class="job-roles-table">
+            <caption>List of currently open job roles</caption>
+            <thead>
               <tr>
-                <td>
-                  {% if role.jobRoleId %}
-                    <a href="/job-roles/{{ role.jobRoleId }}">{{ role.roleName }}</a>
-                  {% else %}
-                    {{ role.roleName }}
-                  {% endif %}
-                </td>
-                <td>
-                  {% if role.jobRoleId %}
-                    <a href="/job-roles/{{ role.jobRoleId }}">View</a>
-                  {% else %}
-                    Not specified
-                  {% endif %}
-                </td>
-                <td>{{ role.location or 'Not specified' }}</td>
-                <td>{{ role.capability or 'Not specified' }}</td>
-                <td>{{ role.band or 'Not specified' }}</td>
-                <td>{{ role.closingDate or 'Not specified' }}</td>
+                <th scope="col">Role name</th>
+                <th scope="col">Specification</th>
+                <th scope="col">Location</th>
+                <th scope="col">Capability</th>
+                <th scope="col">Band</th>
+                <th scope="col">Closing date</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for role in roles %}
+                <tr>
+                  <td>
+                    {% if role.jobRoleId %}
+                      <a class="table-link" href="/job-roles/{{ role.jobRoleId }}">{{ role.roleName }}</a>
+                    {% else %}
+                      {{ role.roleName }}
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if role.jobRoleId %}
+                      <a class="table-link" href="/job-roles/{{ role.jobRoleId }}">View</a>
+                    {% else %}
+                      Not specified
+                    {% endif %}
+                  </td>
+                  <td>{{ role.location or 'Not specified' }}</td>
+                  <td>{{ role.capability or 'Not specified' }}</td>
+                  <td>{{ role.band or 'Not specified' }}</td>
+                  <td>{{ role.closingDate or 'Not specified' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       {% else %}
-        <p>No open job roles found.</p>
+        <div class="page-card">
+          <p>No open job roles found.</p>
+        </div>
       {% endif %}
     </div>
+    {% include "partials/footer.html" %}
   </body>
 </html>

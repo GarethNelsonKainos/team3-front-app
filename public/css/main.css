@@ -364,3 +364,170 @@ body {
 	max-width: 980px;
 	margin: 0 auto;
 }
+
+.page-hero {
+	background: linear-gradient(120deg, rgba(40, 53, 131, 0.12), rgba(97, 168, 63, 0.12));
+	padding: 32px 0 24px;
+	border-bottom: 1px solid rgba(40, 53, 131, 0.12);
+}
+
+.page-hero--compact {
+	padding: 24px 0 16px;
+}
+
+.page-hero__title {
+	margin: 0 0 8px;
+	font-size: 2.2rem;
+}
+
+.page-hero__subtitle {
+	margin: 0;
+	color: var(--kainos-grey);
+}
+
+.eyebrow {
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: var(--kainos-midblue);
+	margin: 0 0 8px;
+}
+
+.page-section {
+	padding: 24px 0 48px;
+}
+
+.page-card {
+	background: #ffffff;
+	border-radius: 14px;
+	box-shadow: 0 12px 30px rgba(40, 53, 131, 0.12);
+	padding: 20px;
+	border: 1px solid rgba(40, 53, 131, 0.08);
+}
+
+.job-roles-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+}
+
+.job-roles-table caption {
+	text-align: left;
+	font-weight: 600;
+	color: var(--kainos-grey);
+	padding-bottom: 12px;
+}
+
+.job-roles-table thead th {
+	text-align: left;
+	background: rgba(40, 53, 131, 0.08);
+	color: var(--kainos-blue);
+	padding: 12px 10px;
+	font-weight: 700;
+	border-bottom: 1px solid rgba(40, 53, 131, 0.12);
+}
+
+.job-roles-table tbody td {
+	padding: 12px 10px;
+	border-bottom: 1px solid rgba(40, 53, 131, 0.08);
+}
+
+.job-roles-table tbody tr:hover {
+	background: rgba(97, 168, 63, 0.06);
+}
+
+.table-link {
+	font-weight: 600;
+}
+
+.apply-form {
+	display: grid;
+	gap: 16px;
+}
+
+.form-field label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.form-field input[type="file"] {
+	width: 100%;
+	border: 1px dashed rgba(40, 53, 131, 0.35);
+	border-radius: 10px;
+	padding: 14px;
+	background: rgba(40, 53, 131, 0.04);
+}
+
+.form-hint {
+	margin: 8px 0 0;
+	font-size: 0.85rem;
+	color: var(--kainos-grey);
+}
+
+.cta-button {
+	background: linear-gradient(120deg, var(--kainos-blue), var(--kainos-midblue));
+	color: #ffffff;
+	border: none;
+	padding: 12px 20px;
+	border-radius: 999px;
+	font-weight: 700;
+	cursor: pointer;
+	width: fit-content;
+}
+
+.cta-button:hover {
+	filter: brightness(1.05);
+}
+
+.text-link {
+	color: var(--kainos-blue);
+	font-weight: 600;
+}
+
+.status-banner {
+	background: rgba(97, 168, 63, 0.12);
+	border: 1px solid rgba(97, 168, 63, 0.4);
+	color: #1a4d2a;
+	padding: 12px 14px;
+	border-radius: 10px;
+	font-weight: 600;
+}
+
+.status-pill {
+	display: inline-block;
+	background: rgba(97, 168, 63, 0.2);
+	color: #1a4d2a;
+	border-radius: 999px;
+	padding: 4px 10px;
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+@media (max-width: 720px) {
+	.job-roles-table,
+	.job-roles-table thead,
+	.job-roles-table tbody,
+	.job-roles-table th,
+	.job-roles-table td,
+	.job-roles-table tr {
+		display: block;
+	}
+
+	.job-roles-table thead {
+		display: none;
+	}
+
+	.job-roles-table tbody tr {
+		margin-bottom: 16px;
+		border: 1px solid rgba(40, 53, 131, 0.12);
+		border-radius: 12px;
+		overflow: hidden;
+	}
+
+	.job-roles-table tbody td {
+		border-bottom: none;
+		padding: 10px 12px;
+	}
+}

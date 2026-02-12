@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Apply for role</title>
+    {% include "partials/linktags.html" %}
+  </head>
+  <body>
+    {% include "partials/header.html" %}
+    <section class="page-hero page-hero--compact">
+      <div class="container">
+        <p class="eyebrow">Application</p>
+        {% if role %}
+          <h1 class="page-hero__title">Apply for {{ role.roleName }}</h1>
+          <p class="page-hero__subtitle">Upload your CV and we will be in touch.</p>
+        {% else %}
+          <h1 class="page-hero__title">Apply for role</h1>
+          <p class="page-hero__subtitle">We could not find that role.</p>
+        {% endif %}
+      </div>
+    </section>
+    <div class="container page-section">
+      {% if role %}
+        <div class="page-card">
+          {% if submitted %}
+            <p class="status-banner">Your application has been submitted.</p>
+            <p><b>Status:</b> <span class="status-pill">In progress</span></p>
+            <p><a class="text-link" href="/job-roles/{{ role.jobRoleId }}">Back to role</a></p>
+          {% else %}
+            <form class="apply-form" method="post" enctype="multipart/form-data">
+              <div class="form-field">
+                <label for="cv">Upload CV</label>
+                <input id="cv" name="cv" type="file" accept=".pdf,.doc,.docx" required />
+                <p class="form-hint">Accepted formats: PDF, DOC, DOCX. Max 10MB.</p>
+              </div>
+              <button class="cta-button" type="submit">Submit application</button>
+            </form>
+            <p><a class="text-link" href="/job-roles/{{ role.jobRoleId }}">Back to role</a></p>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="page-card">
+          <p>Job role not found.</p>
+          <p><a class="text-link" href="/job-roles">Back to job roles</a></p>
+        </div>
+      {% endif %}
+    </div>
+    {% include "partials/footer.html" %}
+  </body>
+</html>
