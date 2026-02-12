@@ -11,45 +11,45 @@
     <div class="container">
       <h1>Open job roles</h1>
       {% if roles and roles.length > 0 %}
-      <table class="job-roles-table">
-        <caption>List of currently open job roles</caption>
-        <thead>
-          <tr>
-            <th scope="col">Role name</th>
-            <th scope="col">Specification</th>
-            <th scope="col">Location</th>
-            <th scope="col">Capability</th>
-            <th scope="col">Band</th>
-            <th scope="col">Closing date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for role in roles %}
-          <tr>
-            <td>
-              {% if role.jobRoleId %}
-              <a href="/job-roles/{{ role.jobRoleId }}">{{ role.roleName }}</a>
-              {% else %}
-              {{ role.roleName }}
-              {% endif %}
-            </td>
-            <td>
-              {% if role.jobRoleId %}
-              <a href="/job-roles/{{ role.jobRoleId }}">View</a>
-              {% else %}
-              -
-              {% endif %}
-            </td>
-            <td>{{ role.location or '-' }}</td>
-            <td>{{ role.capability or '-' }}</td>
-            <td>{{ role.band or '-' }}</td>
-            <td>{{ role.closingDate or '-' }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <table class="job-roles-table">
+          <caption>List of currently open job roles</caption>
+          <thead>
+            <tr>
+              <th scope="col">Role name</th>
+              <th scope="col">Specification</th>
+              <th scope="col">Location</th>
+              <th scope="col">Capability</th>
+              <th scope="col">Band</th>
+              <th scope="col">Closing date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for role in roles %}
+              <tr>
+                <td>
+                  {% if role.jobRoleId %}
+                    <a href="/job-roles/{{ role.jobRoleId }}">{{ role.roleName }}</a>
+                  {% else %}
+                    {{ role.roleName }}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if role.jobRoleId %}
+                    <a href="/job-roles/{{ role.jobRoleId }}">View</a>
+                  {% else %}
+                    Not specified
+                  {% endif %}
+                </td>
+                <td>{{ role.location or 'Not specified' }}</td>
+                <td>{{ role.capability or 'Not specified' }}</td>
+                <td>{{ role.band or 'Not specified' }}</td>
+                <td>{{ role.closingDate or 'Not specified' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       {% else %}
-      <p>No open job roles found.</p>
+        <p>No open job roles found.</p>
       {% endif %}
     </div>
   </body>

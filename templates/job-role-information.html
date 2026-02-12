@@ -1,43 +1,43 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Job role information</title>
-		<link rel="icon" href="/favicon.ico" />
-		<link rel="stylesheet" href="/css/main.css" />
-	</head>
-	<body>
-		{% include "partials/header.html" %}
-		<div class="container">
-			{% if role %}
-			<h1>{{ role.roleName }}</h1>
-			<p><b>Status:</b> {{ role.status or "-" }}</p>
+  <head>
+    <meta charset="utf-8">
+    <title>Job role information</title>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+  <body>
+    {% include "partials/header.html" %}
+    <div class="container">
+      {% if role %}
+        <h1>{{ role.roleName }}</h1>
+        <p><b>Status:</b> {{ role.status or "Not specified" }}</p>
 
-			<h2>Overview</h2>
-			<p><b>Location:</b> {{ role.location or "-" }}</p>
-			<p><b>Capability:</b> {{ role.capability or "-" }}</p>
-			<p><b>Band:</b> {{ role.band or "-" }}</p>
-			<p><b>Closing date:</b> {{ role.closingDate or "-" }}</p>
-			<p><b>Open positions:</b> {{ role.numberOfOpenPositions or "-" }}</p>
+        <h2>Overview</h2>
+        <p><b>Location:</b> {{ role.location or "Not specified" }}</p>
+        <p><b>Capability:</b> {{ role.capability or "Not specified" }}</p>
+        <p><b>Band:</b> {{ role.band or "Not specified" }}</p>
+        <p><b>Closing date:</b> {{ role.closingDate or "Not specified" }}</p>
+        <p><b>Open positions:</b> {{ role.numberOfOpenPositions or "Not specified" }}</p>
 
-			<h2>Description</h2>
-			<p>{{ role.description or "-" }}</p>
+        <h2>Description</h2>
+        <p>{{ role.description or "Not specified" }}</p>
 
-			<h2>Responsibilities</h2>
-			<p>{{ role.responsibilities or "-" }}</p>
+        <h2>Responsibilities</h2>
+        <p>{{ role.responsibilities or "Not specified" }}</p>
 
-			<h2>Job spec</h2>
-			{% if role.sharepointUrl %}
-			<p><a href="{{ role.sharepointUrl }}" target="_blank" rel="noopener noreferrer">View job spec (SharePoint)</a></p>
-			{% else %}
-			<p>-</p>
-			{% endif %}
+        <h2>Job spec</h2>
+        {% if role.sharepointUrl %}
+          <p><a href="{{ role.sharepointUrl }}" target="_blank" rel="noopener noreferrer">View job spec (SharePoint)</a></p>
+        {% else %}
+          <p>Not specified</p>
+        {% endif %}
 
-			<p><a href="/job-roles">Back to job roles</a></p>
-			{% else %}
-			<p>Job role not found.</p>
-			<p><a href="/job-roles">Back to job roles</a></p>
-			{% endif %}
-		</div>
-	</body>
+        <p><a href="/job-roles">Back to job roles</a></p>
+      {% else %}
+        <p>Job role not found.</p>
+        <p><a href="/job-roles">Back to job roles</a></p>
+      {% endif %}
+    </div>
+  </body>
 </html>
