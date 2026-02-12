@@ -38,10 +38,17 @@ interface ErrorHandler extends Error {
 	message: string;
 }
 
-app.use((err: ErrorHandler, _req: Request, res: Response, _next: express.NextFunction) => {
-	console.error(err);
-	res.status(500).json({ error: err.message });
-});
+app.use(
+	(
+		err: ErrorHandler,
+		_req: Request,
+		res: Response,
+		_next: express.NextFunction,
+	) => {
+		console.error(err);
+		res.status(500).json({ error: err.message });
+	},
+);
 
 export { app };
 
