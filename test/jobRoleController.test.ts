@@ -1,6 +1,6 @@
 import express from "express";
 import nunjucks from "nunjucks";
-import path from "path";
+import path from "node:path";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import jobRoleController from "../src/controllers/jobRoleController";
@@ -44,7 +44,7 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles should render job roles list", async () => {
-		(jobRoleService.getOpenJobRoles as any).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
 		const res = await request(app).get("/job-roles");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Open job roles");
@@ -53,7 +53,7 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles/:id should render job role detail", async () => {
-		(jobRoleService.getJobRoleById as any).mockResolvedValue(mockRoleDetail);
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
 		const res = await request(app).get("/job-roles/1");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Dev");
@@ -62,7 +62,7 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles/:id should show not found if role missing", async () => {
-		(jobRoleService.getJobRoleById as any).mockResolvedValue(undefined);
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(undefined);
 		const res = await request(app).get("/job-roles/999");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Job role not found");
