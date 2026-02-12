@@ -1,5 +1,5 @@
 import axios from "axios";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import jobRoleService, {
 	type JobRoleResponse,
 } from "../src/services/jobRoleService";
@@ -10,6 +10,10 @@ vi.mock("axios", () => ({
 	},
 }));
 const mockedAxios = axios as unknown as { get: ReturnType<typeof vi.fn> };
+
+afterEach(() => {
+	vi.clearAllMocks();
+});
 
 describe("getOpenJobRoles", () => {
 	it("returns empty array if no open roles", async () => {
