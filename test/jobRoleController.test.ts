@@ -1,6 +1,6 @@
+import path from "node:path";
 import express from "express";
 import nunjucks from "nunjucks";
-import path from "node:path";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import jobRoleController from "../src/controllers/jobRoleController";
