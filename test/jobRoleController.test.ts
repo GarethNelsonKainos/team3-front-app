@@ -18,7 +18,7 @@ nunjucks.configure(path.join(__dirname, "../templates"), {
 	express: app,
 });
 
-app.use("/job-roles", jobRoleController);
+app.use("/", jobRoleController);
 
 const mockRoles = [
 	{ jobRoleId: 1, roleName: "Dev", status: "open" },
