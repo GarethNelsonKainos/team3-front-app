@@ -1,8 +1,7 @@
 import express, { type Request, type Response } from "express";
 import nunjucks from "nunjucks";
-import { validateLogin } from "./utils/login";
-
 import jobRoleController from "./controllers/jobRoleController";
+import { validateLogin } from "./utils/login";
 
 const app = express();
 
