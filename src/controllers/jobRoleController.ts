@@ -5,11 +5,12 @@ const router = Router();
 
 router.get("/job-roles", async (_req: Request, res: Response) => {
 	try {
-		const roles = await jobRoleService.getOpenJobRoles();
+		let roles = await jobRoleService.getOpenJobRoles();
+		if (!Array.isArray(roles)) roles = [];
 		res.render("job-role-list.html", { roles });
 	} catch (err) {
 		console.error("Failed to load job roles", err);
-		res.status(500).send("Failed to load job roles");
+		res.render("job-role-list.html", { roles: [] });
 	}
 });
 
@@ -18,23 +19,13 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 		const id = String(req.params.id);
 		const role = await jobRoleService.getJobRoleById(id);
 		let canApply = false;
-		if (
-			role &&
-			role.status?.toLowerCase() === "open" &&
-			(role.numberOfOpenPositions ?? 0) > 0
-		) {
+		if (role && role.status?.toLowerCase() === "open" && (role.numberOfOpenPositions ?? 0) > 0) {
 			canApply = true;
-		}
-		if (!role) {
-			return res.render("job-role-information.html", {
-				role: undefined,
-				canApply: false,
-			});
 		}
 		res.render("job-role-information.html", { role, canApply });
 	} catch (err) {
 		console.error("Failed to load job role", err);
-		res.status(500).send("Failed to load job role");
+		res.render("job-role-information.html", { role: undefined, canApply: false });
 	}
 });
 
@@ -43,16 +34,10 @@ router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
 	try {
 		const id = String(req.params.id);
 		const role = await jobRoleService.getJobRoleById(id);
-		if (!role) {
-			return res.render("job-role-apply.html", {
-				role: undefined,
-				submitted: false,
-			});
-		}
 		res.render("job-role-apply.html", { role, submitted: false });
 	} catch (err) {
 		console.error("Failed to load apply form", err);
-		res.status(500).send("Failed to load apply form");
+		res.render("job-role-apply.html", { role: undefined, submitted: false });
 	}
 });
 
@@ -61,16 +46,10 @@ router.post("/job-roles/:id/apply", async (req: Request, res: Response) => {
 	try {
 		const id = String(req.params.id);
 		const role = await jobRoleService.getJobRoleById(id);
-		if (!role) {
-			return res.render("job-role-apply.html", {
-				role: undefined,
-				submitted: false,
-			});
-		}
-		res.render("job-role-apply.html", { role, submitted: true });
+		res.render("job-role-apply.html", { role, submitted: !!role });
 	} catch (err) {
 		console.error("Failed to submit application", err);
-		res.status(500).send("Failed to submit application");
+		res.render("job-role-apply.html", { role: undefined, submitted: false });
 	}
 });
 
