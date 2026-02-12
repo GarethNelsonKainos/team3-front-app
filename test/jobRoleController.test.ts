@@ -1,10 +1,10 @@
-import request from "supertest";
 import express from "express";
-import jobRoleController from "../src/controllers/jobRoleController";
-import * as jobRoleService from "../src/services/jobRoleService";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import nunjucks from "nunjucks";
 import path from "path";
+import request from "supertest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import jobRoleController from "../src/controllers/jobRoleController";
+import * as jobRoleService from "../src/services/jobRoleService";
 
 vi.mock("../src/services/jobRoleService");
 
