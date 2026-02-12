@@ -17,7 +17,18 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 	try {
 		const id = String(req.params.id);
 		const role = await jobRoleService.getJobRoleById(id);
-		res.render("job-role-information.html", { role });
+		let canApply = false;
+		if (
+			role &&
+			role.jobRoleId &&
+			typeof role.status === "string" &&
+			role.status.toLowerCase() === "open" &&
+			typeof role.numberOfOpenPositions === "number" &&
+			role.numberOfOpenPositions > 0
+		) {
+			canApply = true;
+		}
+		res.render("job-role-information.html", { role, canApply });
 	} catch (err) {
 		console.error("Failed to load job role", err);
 		res.status(500).send("Failed to load job role");
