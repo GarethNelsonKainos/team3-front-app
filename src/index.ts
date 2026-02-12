@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from "express";
 import nunjucks from "nunjucks";
-import jobRoleController from "./controllers/jobRoleController";
-import { validateLogin } from "./utils/login";
+import jobRoleController from "./controllers/jobRoleController.js";
+import { validateLogin } from "./utils/login.js";
 
 const app = express();
 
@@ -34,7 +34,11 @@ app.post("/login", (req: Request, res: Response) => {
 	res.status(200).json({ message: "Login valid" });
 });
 
-app.use((err: Error, _req: Request, res: Response) => {
+interface ErrorHandler extends Error {
+	message: string;
+}
+
+app.use((err: ErrorHandler, _req: Request, res: Response, _next: express.NextFunction) => {
 	console.error(err);
 	res.status(500).json({ error: err.message });
 });

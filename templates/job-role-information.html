@@ -11,12 +11,12 @@
     <div class="container">
       {% if role %}
         <h1>{{ role.roleName }}</h1>
-        <p><b>Status:</b> {{ role.status or "Not specified" }}</p>
+        <p><b>Status:</b> {{ role.status.statusName or "Not specified" }}</p>
 
         <h2>Overview</h2>
         <p><b>Location:</b> {{ role.location or "Not specified" }}</p>
-        <p><b>Capability:</b> {{ role.capability or "Not specified" }}</p>
-        <p><b>Band:</b> {{ role.band or "Not specified" }}</p>
+        <p><b>Capability:</b> {{ role.capability.capabilityName or "Not specified" }}</p>
+        <p><b>Band:</b> {{ role.band.bandName or "Not specified" }}</p>
         <p><b>Closing date:</b> {{ role.closingDate or "Not specified" }}</p>
         <p><b>Open positions:</b> {{ role.numberOfOpenPositions or "Not specified" }}</p>
 
