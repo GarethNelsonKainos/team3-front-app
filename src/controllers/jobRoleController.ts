@@ -19,13 +19,20 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 		const id = String(req.params.id);
 		const role = await jobRoleService.getJobRoleById(id);
 		let canApply = false;
-		if (role && role.status?.toLowerCase() === "open" && (role.numberOfOpenPositions ?? 0) > 0) {
+		if (
+			role &&
+			role.status?.toLowerCase() === "open" &&
+			(role.numberOfOpenPositions ?? 0) > 0
+		) {
 			canApply = true;
 		}
 		res.render("job-role-information.html", { role, canApply });
 	} catch (err) {
 		console.error("Failed to load job role", err);
-		res.render("job-role-information.html", { role: undefined, canApply: false });
+		res.render("job-role-information.html", {
+			role: undefined,
+			canApply: false,
+		});
 	}
 });
 
