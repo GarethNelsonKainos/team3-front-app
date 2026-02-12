@@ -22,7 +22,7 @@ export interface JobRoleResponse {
 	};
 }
 
-const API_BASE = "http://localhost:3001";
+const API_BASE = process.env.API_BASE_URL || "http://localhost:4000";
 
 export async function getOpenJobRoles(): Promise<JobRoleResponse[]> {
 	const url = `${API_BASE}/api/job-roles/open`;
