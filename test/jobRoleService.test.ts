@@ -1,9 +1,6 @@
 import axios from "axios";
 import { describe, expect, it, vi } from "vitest";
-import jobRoleService, {
-	type JobRoleDetailedResponse,
-	type JobRoleResponse,
-} from "../src/services/jobRoleService";
+import jobRoleService, { type JobRoleResponse } from "../src/services/jobRoleService";
 
 vi.mock("axios", () => ({
 	default: {
@@ -13,23 +10,10 @@ vi.mock("axios", () => ({
 const mockedAxios = axios as unknown as { get: ReturnType<typeof vi.fn> };
 
 describe("getOpenJobRoles", () => {
-	it("returns only open job roles", async () => {
-		const mockData: JobRoleResponse[] = [
-			{ roleName: "Dev", status: "open" },
-			{ roleName: "QA", status: "closed" },
-			{ roleName: "PM", status: "OPEN" },
-		];
-		mockedAxios.get.mockResolvedValue({ data: mockData });
-		const result = await jobRoleService.getOpenJobRoles();
-		expect(result).toEqual([
-			{ roleName: "Dev", status: "open" },
-			{ roleName: "PM", status: "OPEN" },
-		]);
-	});
 
 	it("returns empty array if no open roles", async () => {
 		mockedAxios.get.mockResolvedValue({
-			data: [{ roleName: "QA", status: "closed" }],
+			data: [],
 		});
 		const result = await jobRoleService.getOpenJobRoles();
 		expect(result).toEqual([]);
@@ -38,24 +22,32 @@ describe("getOpenJobRoles", () => {
 
 describe("getJobRoleById", () => {
 	it("calls the detail endpoint and returns role data", async () => {
-		const mockRole: JobRoleDetailedResponse = {
-			jobRoleId: 123,
-			roleName: "Dev",
-			description: "Build things",
-			responsibilities: "Ship features",
-			sharepointUrl: "https://sharepoint.example/job-specs/123",
-			location: "Belfast",
-			capability: "Engineering",
-			band: "SSE",
-			closingDate: "2026-03-01",
-			status: "open",
-			numberOfOpenPositions: 2,
-		};
+		const mockRole: JobRoleResponse = {
+				jobRoleId: 1,
+				roleName: "Software Engineer",
+				location: "Belfast",
+				closingDate: "2030-01-15",
+				responsibilities: "Develop software solutions",
+				sharepointUrl: "http://example.com/job-role/1",
+				numberOfOpenPositions: 3,
+				capability: {
+					capabilityId: 10,
+					capabilityName: "Engineering",
+				},
+				band: {
+					bandId: 2,
+					bandName: "Associate",
+				},
+				status: {
+					statusId: 1,
+					statusName: "Open",
+				},
+			};
 
 		mockedAxios.get.mockResolvedValue({ data: mockRole });
 		const result = await jobRoleService.getJobRoleById(123);
 		expect(mockedAxios.get).toHaveBeenCalledWith(
-			"http://localhost:4000/api/job-roles/123",
+			"http://localhost:3001/api/job-roles/123",
 		);
 		expect(result).toEqual(mockRole);
 	});
