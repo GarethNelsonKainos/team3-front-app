@@ -35,12 +35,13 @@ router.post("/login", async (req: Request, res: Response) => {
 		});
 		res.redirect("/job-roles");
 	} catch (err: any) {
-		console.error("Login error", err);
+		console.error("Login error", err?.response?.status, err?.message);
 		const message =
 			err?.response?.status === 401
 				? "Invalid email or password."
 				: "Login failed. Please try again.";
-		res.render("login.html", { error: message });
+		res.status(401).render("login.html", { error: message });
+		return;
 	}
 });
 
