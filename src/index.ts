@@ -1,4 +1,8 @@
-import express, { type Request, type Response } from "express";
+import express, {
+	type NextFunction,
+	type Request,
+	type Response,
+} from "express";
 import nunjucks from "nunjucks";
 import jobRoleController from "./controllers/jobRoleController";
 import loginController from "./controllers/loginController";
@@ -21,9 +25,10 @@ app.get("/", (_req: Request, res: Response) => {
 	res.render("index.html");
 });
 
-app.use((err: Error, _req: Request, res: Response) => {
+app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 	console.error(err);
-	res.status(500).json({ error: err.message });
+	res.status(500).send(`error: ${err.message}`);
+	next(err);
 });
 
 export { app };

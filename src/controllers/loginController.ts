@@ -20,13 +20,12 @@ router.post("/login", (req: Request, res: Response) => {
 		};
 		const validation = validateLogin(email, password);
 		if (!validation.valid) {
-			res.status(400).json({ errors: validation.errors });
-			return;
+			res.status(400).send("Login invalid - missing email or password");
 		}
-		res.status(200).json({ message: "Login valid" });
+		res.status(200).send("Login valid");
 	} catch (err) {
 		console.error("Login error", err);
-		res.status(500).json({ error: "Login failed" });
+		res.status(500).send("Login failed");
 	}
 });
 

@@ -9,7 +9,7 @@ describe("POST /login", () => {
 			.set("Content-Type", "application/json")
 			.send({ email: "test@example.com", password: "password123" });
 		expect(response.status).toBe(200);
-		expect(response.body.message).toBe("Login valid");
+		expect(response.text).toBe("Login valid");
 	});
 
 	it("should return error with missing credentials", async () => {
@@ -18,7 +18,7 @@ describe("POST /login", () => {
 			.set("Content-Type", "application/json")
 			.send({ email: "test@example.com" });
 		expect(response.status).toBe(400);
-		expect(response.body.errors).toContain("Password is required");
+		expect(response.text).toBe("Login invalid - missing email or password");
 	});
 });
 
