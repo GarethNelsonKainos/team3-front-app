@@ -1,5 +1,5 @@
 import request from "supertest";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { app } from "../../src/index";
 import authService from "../../src/services/authService";
 
@@ -30,7 +30,9 @@ describe("POST /login", () => {
 			.send({ email: "test@example.com" }); // Missing password
 
 		expect(response.status).toBe(200);
-		expect(response.text).toContain("Please provide a valid email and password.");
+		expect(response.text).toContain(
+			"Please provide a valid email and password.",
+		);
 	});
 
 	it("should return error with invalid credentials", async () => {
