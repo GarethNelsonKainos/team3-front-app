@@ -17,35 +17,34 @@
     </section>
     <div class="container page-section">
       {% if role %}
-        <div class="page-card">
-          <dl class="job-role-details">
-            <dt>Status</dt>
-            <dd>{{ role.status or "Not specified" }}</dd>
-            <dt>Location</dt>
-            <dd>{{ role.location or "Not specified" }}</dd>
-            <dt>Capability</dt>
-            <dd>{{ role.capability.name or "Not specified" }}</dd>
-            <dt>Band</dt>
-            <dd>{{ role.band or "Not specified" }}</dd>
-            <dt>Closing date</dt>
-            <dd>{{ role.closingDate or "Not specified" }}</dd>
-            <dt>Open positions</dt>
-            <dd>{{ role.numberOfOpenPositions or "Not specified" }}</dd>
-          </dl>
-          <h2>Description</h2>
-          <p>{{ role.description or "Not specified" }}</p>
-          <h2>Responsibilities</h2>
-          <p>{{ role.responsibilities or "Not specified" }}</p>
-          <div class="job-role-actions">
-            {% if role.sharepointUrl %}
-              <a class="cta-button" href="{{ role.sharepointUrl }}" target="_blank" rel="noopener noreferrer">View job spec (SharePoint)</a>
-            {% endif %}
-            {% if canApply %}
-              <a class="cta-button" href="/job-roles/{{ role.jobRoleId }}/apply">Apply for this role</a>
-            {% endif %}
-          </div>
-          <p><a href="/job-roles">Back to job roles</a></p>
-        </div>
+        <h1>{{ role.roleName }}</h1>
+        <p><b>Status:</b> {{ role.status.statusName or "Not specified" }}</p>
+
+        <h2>Overview</h2>
+        <p><b>Location:</b> {{ role.location or "Not specified" }}</p>
+        <p><b>Capability:</b> {{ role.capability.capabilityName or "Not specified" }}</p>
+        <p><b>Band:</b> {{ role.band.bandName or "Not specified" }}</p>
+        <p><b>Closing date:</b> {{ role.closingDate or "Not specified" }}</p>
+        <p><b>Open positions:</b> {{ role.numberOfOpenPositions or "Not specified" }}</p>
+
+        <h2>Description</h2>
+        <p>{{ role.description or "Not specified" }}</p>
+
+        <h2>Responsibilities</h2>
+        <p>{{ role.responsibilities or "Not specified" }}</p>
+
+        <h2>Job spec</h2>
+        {% if role.sharepointUrl %}
+          <p><a href="{{ role.sharepointUrl }}" target="_blank" rel="noopener noreferrer">View job spec (SharePoint)</a></p>
+        {% else %}
+          <p>Not specified</p>
+        {% endif %}
+
+        {% if canApply %}
+          <p><a href="/job-roles/{{ role.jobRoleId }}/apply">Apply for this role</a></p>
+        {% endif %}
+
+        <p><a href="/job-roles">Back to job roles</a></p>
       {% else %}
         <div class="page-card">
           <p>Job role not found.</p>

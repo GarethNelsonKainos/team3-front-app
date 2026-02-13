@@ -1,5 +1,5 @@
 import { type Request, type Response, Router } from "express";
-import jobRoleService from "../services/jobRoleService";
+import jobRoleService from "../services/jobRoleService.js";
 
 const router = Router();
 
@@ -19,11 +19,7 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 		const id = String(req.params.id);
 		const role = await jobRoleService.getJobRoleById(id);
 		let canApply = false;
-		if (
-			role &&
-			role.status?.toLowerCase() === "open" &&
-			(role.numberOfOpenPositions ?? 0) > 0
-		) {
+		if (role && (role.numberOfOpenPositions ?? 0) > 0) {
 			canApply = true;
 		}
 		res.render("job-role-information.html", { role, canApply });

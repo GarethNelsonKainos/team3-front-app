@@ -48,8 +48,8 @@
                     {% endif %}
                   </td>
                   <td>{{ role.location or 'Not specified' }}</td>
-                  <td>{{ role.capability or 'Not specified' }}</td>
-                  <td>{{ role.band or 'Not specified' }}</td>
+                  <td>{{ role.capability.capabilityName or 'Not specified' }}</td>
+                  <td>{{ role.band.bandName or 'Not specified' }}</td>
                   <td>{{ role.closingDate or 'Not specified' }}</td>
                 </tr>
               {% endfor %}

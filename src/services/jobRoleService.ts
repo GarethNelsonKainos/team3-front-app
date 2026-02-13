@@ -1,46 +1,41 @@
 import axios from "axios";
 
 export interface JobRoleResponse {
-	jobRoleId?: number;
-	roleName: string;
-	location?: string;
-	capability?: string;
-	band?: string;
-	closingDate?: string;
-	status?: string;
-}
-
-export interface JobRoleDetailedResponse {
 	jobRoleId: number;
 	roleName: string;
-	description?: string;
-	responsibilities?: string;
-	sharepointUrl?: string;
-	location?: string;
-	capability?: string;
-	band?: string;
-	closingDate?: string;
-	status?: string;
-	numberOfOpenPositions?: number;
+	location: string;
+	closingDate: string;
+	responsibilities: string;
+	sharepointUrl: string;
+	numberOfOpenPositions: number;
+	capability: {
+		capabilityId: number;
+		capabilityName: string;
+	};
+	band: {
+		bandId: number;
+		bandName: string;
+	};
+	status: {
+		statusId: number;
+		statusName: string;
+	};
 }
 
-const API_BASE = process.env.API_BASE_URL || "http://localhost:4000";
+const API_BASE = process.env.API_BASE_URL || "http://localhost:3001";
 
 export async function getOpenJobRoles(): Promise<JobRoleResponse[]> {
-	const url = `${API_BASE}/api/job-roles`;
+	const url = `${API_BASE}/api/job-roles/open`;
 	const resp = await axios.get<JobRoleResponse[]>(url);
-	const data = resp.data || [];
-	return data.filter(
-		(r: JobRoleResponse) => (r.status || "").toLowerCase() === "open",
-	);
+	return resp.data || [];
 }
 
 export async function getJobRoleById(
 	jobRoleId: number | string,
-): Promise<JobRoleDetailedResponse | undefined> {
+): Promise<JobRoleResponse | undefined> {
 	const url = `${API_BASE}/api/job-roles/${jobRoleId}`;
 	try {
-		const resp = await axios.get<JobRoleDetailedResponse>(url);
+		const resp = await axios.get<JobRoleResponse>(url);
 		return resp.data;
 	} catch (err: any) {
 		if (err.response && err.response.status === 404) {
