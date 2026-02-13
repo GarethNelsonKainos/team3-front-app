@@ -66,15 +66,18 @@ describe("POST /logout", () => {
 		expect(response.status).toBe(302);
 		expect(response.header.location).toBe("/");
 		const setCookieHeader = response.headers["set-cookie"];
-		const setCookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
-		const setCookie = setCookies.find((c: string) => c && c.startsWith("token="));
+		const setCookies = Array.isArray(setCookieHeader)
+			? setCookieHeader
+			: [setCookieHeader];
+		const setCookie = setCookies.find(
+			(c: string) => c && c.startsWith("token="),
+		);
 		expect(setCookie).toBeDefined();
 		expect(setCookie).toMatch(/token=;/);
 	});
 
 	it("should redirect to home even if no token cookie is present", async () => {
-		const response = await request(app)
-			.post("/logout");
+		const response = await request(app).post("/logout");
 
 		expect(response.status).toBe(302);
 		expect(response.header.location).toBe("/");
