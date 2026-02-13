@@ -1,7 +1,11 @@
-import express, { type Request, type Response } from "express";
+import express, {
+	type NextFunction,
+	type Request,
+	type Response,
+} from "express";
 import nunjucks from "nunjucks";
-import jobRoleController from "./controllers/jobRoleController.js";
-import { validateLogin } from "./utils/login.js";
+import jobRoleController from "./controllers/jobRoleController";
+import loginController from "./controllers/loginController";
 
 const app = express();
 
@@ -15,40 +19,17 @@ nunjucks.configure("templates", {
 });
 
 app.use(jobRoleController);
+app.use(loginController);
 
 app.get("/", (_req: Request, res: Response) => {
 	res.render("index.html");
 });
 
-app.get("/login", (_req: Request, res: Response) => {
-	res.render("login.html");
+app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
+	console.error(err);
+	res.status(500).send(`error: ${err.message}`);
+	next(err);
 });
-
-app.post("/login", (req: Request, res: Response) => {
-	const { email, password } = req.body as { email?: string; password?: string };
-	const validation = validateLogin(email, password);
-	if (!validation.valid) {
-		res.status(400).json({ errors: validation.errors });
-		return;
-	}
-	res.status(200).json({ message: "Login valid" });
-});
-
-interface ErrorHandler extends Error {
-	message: string;
-}
-
-app.use(
-	(
-		err: ErrorHandler,
-		_req: Request,
-		res: Response,
-		_next: express.NextFunction,
-	) => {
-		console.error(err);
-		res.status(500).json({ error: err.message });
-	},
-);
 
 export { app };
 
