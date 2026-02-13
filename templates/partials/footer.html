@@ -81,3 +81,14 @@
     </div>
   </div>
 </footer>
+<script>
+  // Sync JWT token between cookie and sessionStorage
+  (function () {
+    const match = document.cookie.match(/(?:^|;\s*)token=([^;]*)/);
+    if (match && match[1]) {
+      sessionStorage.setItem("token", match[1]);
+    } else {
+      sessionStorage.removeItem("token");
+    }
+  })();
+</script>

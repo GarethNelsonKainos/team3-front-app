@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import express, {
 	type NextFunction,
 	type Request,
@@ -12,10 +13,17 @@ const app = express();
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 nunjucks.configure("templates", {
 	autoescape: true,
 	express: app,
+});
+
+// Make token available to all templates
+app.use((req: Request, res: Response, next: NextFunction) => {
+	res.locals.token = req.cookies?.token || null;
+	next();
 });
 
 app.use(jobRoleController);
