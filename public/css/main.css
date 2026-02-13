@@ -1,3 +1,26 @@
+/* Job role details styling */
+.job-role-details {
+	display: grid;
+	grid-template-columns: 1fr 2fr;
+	gap: 8px 24px;
+	margin-bottom: 32px;
+	font-size: 1rem;
+}
+.job-role-details dt {
+	font-weight: 700;
+	color: var(--kainos-blue);
+	margin-bottom: 2px;
+}
+.job-role-details dd {
+	margin: 0 0 8px 0;
+	color: var(--kainos-grey);
+}
+.job-role-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin-bottom: 24px;
+}
 h1,
 h2,
 h3,
