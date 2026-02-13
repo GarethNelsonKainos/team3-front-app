@@ -21,7 +21,7 @@ router.post("/login", async (req: Request, res: Response) => {
 		};
 		const validation = validateLogin(email, password);
 		if (!validation.valid) {
-			res.render("error.html", {
+			res.render("login.html", {
 				error: "Please provide a valid email and password.",
 				email,
 			});
