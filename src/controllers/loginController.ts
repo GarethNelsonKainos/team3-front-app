@@ -1,18 +1,19 @@
 import { type Request, type Response, Router } from "express";
-import { validateLogin } from "../utils/login";
+import authService from "../services/authService.js";
+import { validateLogin } from "../utils/login.js";
 
 const router = Router();
 
 router.get("/login", (_req: Request, res: Response) => {
 	try {
-		res.render("login.html");
+		res.render("login.html", { error: null });
 	} catch (err) {
 		console.error("Failed to load login page", err);
 		res.status(500).send("Failed to load login page");
 	}
 });
 
-router.post("/login", (req: Request, res: Response) => {
+router.post("/login", async (req: Request, res: Response) => {
 	try {
 		const { email, password } = req.body as {
 			email?: string;
@@ -20,13 +21,34 @@ router.post("/login", (req: Request, res: Response) => {
 		};
 		const validation = validateLogin(email, password);
 		if (!validation.valid) {
-			res.status(400).send("Login invalid - missing email or password");
+			res.render("login.html", {
+				error: "Please provide a valid email and password.",
+				email,
+			});
+			return;
 		}
-		res.status(200).send("Login valid");
-	} catch (err) {
-		console.error("Login error", err);
-		res.status(500).send("Login failed");
+		const token = await authService.login(email as string, password as string);
+		// Store token in a cookie so server-side routes can read it
+		res.cookie("token", token, {
+			httpOnly: true,
+			sameSite: "strict",
+			maxAge: 8 * 60 * 60 * 1000, // 8 hours
+		});
+		res.redirect("/job-roles");
+	} catch (err: any) {
+		console.error("Login error", err?.response?.status, err?.message);
+		const message =
+			err?.response?.status === 401
+				? "Invalid email or password."
+				: "Login failed. Please try again.";
+		res.render("login.html", { error: message, email: req.body.email });
+		return;
 	}
+});
+
+router.post("/logout", (_req: Request, res: Response) => {
+	res.clearCookie("token");
+	res.redirect("/");
 });
 
 export default router;

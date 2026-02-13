@@ -10,33 +10,46 @@
   </head>
 <body>
   {% include "partials/header.html" %}  
-  <div class="hero container">
-    <h1>Login to Kainos Careers</h1>
-    <p>Login to manage your account.</p>
-    <form class="login-form" action="/login" method="post" aria-labelledby="login-title">
-      <div class="form-field">
-        <label for="login-email">Email</label>
-        <input
-          type="email"
-          id="login-email"
-          name="email"
-          autocomplete="email"
-          required
-          inputmode="email"
-        >
-      </div>
-      <div class="form-field">
-        <label for="login-password">Password</label>
-        <input
-          type="password"
-          id="login-password"
-          name="password"
-          autocomplete="current-password"
-          required
-        >
-      </div>
-      <button type="submit" class="button">Log in</button>
-    </form>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Account</p>
+      <h1 class="page-hero__title">Login to Kainos Careers</h1>
+      <p class="page-hero__subtitle">Login to manage your account.</p>
+    </div>
+  </section>
+  <div class="container page-section">
+    <div class="page-card" style="max-width: 420px; margin: 0 auto;">
+      {% if error %}
+        <div class="status-banner" style="background: rgba(220,53,69,0.12); border-color: rgba(220,53,69,0.4); color: #721c24; margin-bottom: 16px;">
+          {{ error }}
+        </div>
+      {% endif %}
+      <form class="login-form" action="/login" method="post" aria-labelledby="login-title">
+        <div class="form-field">
+          <label for="login-email">Email</label>
+          <input
+            type="email"
+            id="login-email"
+            name="email"
+            value="{{ email }}"
+            autocomplete="email"
+            required
+            inputmode="email"
+          >
+        </div>
+        <div class="form-field">
+          <label for="login-password">Password</label>
+          <input
+            type="password"
+            id="login-password"
+            name="password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+        <button type="submit" class="cta-button" style="width:100%; margin-top:12px;">Log in</button>
+      </form>
+    </div>
   </div>
   {% include "partials/footer.html" %}
 </body>
