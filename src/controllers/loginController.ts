@@ -1,6 +1,6 @@
 import { type Request, type Response, Router } from "express";
-import { validateLogin } from "../utils/login";
-import authService from "../services/authService";
+import { validateLogin } from "../utils/login.js";
+import authService from "../services/authService.js";
 
 const router = Router();
 
@@ -21,7 +21,7 @@ router.post("/login", async (req: Request, res: Response) => {
 		};
 		const validation = validateLogin(email, password);
 		if (!validation.valid) {
-			res.render("login.html", {
+			res.render("error.html", {
 				error: "Please provide a valid email and password.",
 				email,
 			});

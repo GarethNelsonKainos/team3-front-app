@@ -5,8 +5,8 @@ import express, {
 	type Response,
 } from "express";
 import nunjucks from "nunjucks";
-import jobRoleController from "./controllers/jobRoleController";
-import loginController from "./controllers/loginController";
+import jobRoleController from "./controllers/jobRoleController.js";
+import loginController from "./controllers/loginController.js";
 
 const app = express();
 
