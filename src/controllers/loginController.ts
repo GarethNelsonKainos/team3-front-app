@@ -23,6 +23,7 @@ router.post("/login", async (req: Request, res: Response) => {
 		if (!validation.valid) {
 			res.render("login.html", {
 				error: "Please provide a valid email and password.",
+				email,
 			});
 			return;
 		}
@@ -40,7 +41,7 @@ router.post("/login", async (req: Request, res: Response) => {
 			err?.response?.status === 401
 				? "Invalid email or password."
 				: "Login failed. Please try again.";
-		res.status(401).render("login.html", { error: message });
+		res.render("login.html", { error: message, email: req.body.email });
 		return;
 	}
 });
