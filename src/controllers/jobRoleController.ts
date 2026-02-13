@@ -3,14 +3,70 @@ import jobRoleService from "../services/jobRoleService.js";
 
 const router = Router();
 
-router.get("/job-roles", async (_req: Request, res: Response) => {
+router.get("/job-roles", async (req: Request, res: Response) => {
 	try {
-		let roles = await jobRoleService.getOpenJobRoles();
+		const getString = (value: unknown) =>
+			typeof value === "string" && value.trim().length > 0
+				? value.trim()
+				: undefined;
+		const getStringArray = (value: unknown) => {
+			if (Array.isArray(value)) {
+				return value
+					.filter((item) => typeof item === "string" && item.trim().length > 0)
+					.map((item) => item.trim());
+			}
+			if (typeof value === "string" && value.trim().length > 0) {
+				return [value.trim()];
+			}
+			return [];
+		};
+
+		const capability = getStringArray(req.query.capability);
+		const band = getStringArray(req.query.band);
+		const filters = {
+			roleName: getString(req.query.roleName),
+			location: getString(req.query.location),
+			closingDate: getString(req.query.closingDate),
+			capability: capability.length > 0 ? capability : undefined,
+			band: band.length > 0 ? band : undefined,
+		};
+
+		let roles = await jobRoleService.getOpenJobRoles(filters);
 		if (!Array.isArray(roles)) roles = [];
-		res.render("job-role-list.html", { roles });
+		const capabilityOptions = Array.from(
+			new Set(
+				roles
+					.map((role) => role.capability?.capabilityName)
+					.filter((value): value is string => Boolean(value)),
+			),
+		).sort();
+		const bandOptions = Array.from(
+			new Set(
+				roles
+					.map((role) => role.band?.bandName)
+					.filter((value): value is string => Boolean(value)),
+			),
+		).sort();
+		res.render("job-role-list.html", {
+			roles,
+			filters,
+			capabilityOptions,
+			bandOptions,
+		});
 	} catch (err) {
 		console.error("Failed to load job roles", err);
-		res.render("job-role-list.html", { roles: [] });
+		res.render("job-role-list.html", {
+			roles: [],
+			filters: {
+				roleName: undefined,
+				location: undefined,
+				closingDate: undefined,
+				capability: undefined,
+				band: undefined,
+			},
+			capabilityOptions: [],
+			bandOptions: [],
+		});
 	}
 });
 

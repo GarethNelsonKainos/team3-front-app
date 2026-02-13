@@ -41,6 +41,7 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 
 export { app };
 
-app.listen(3000, () => {
-	console.log("Server running on http://localhost:3000");
+const port = Number(process.env.PORT) || 3001;
+app.listen(port, () => {
+	console.log(`Server running on http://localhost:${port}`);
 });
