@@ -1,6 +1,6 @@
 import { type Request, type Response, Router } from "express";
-import { validateLogin } from "../utils/login";
-import authService from "../services/authService";
+import { validateLogin } from "../utils/login.js";
+import authService from "../services/authService.js";
 
 const router = Router();
 
