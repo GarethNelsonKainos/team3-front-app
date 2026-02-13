@@ -6,7 +6,9 @@
       <a href="/">Home</a>
       <a href="/job-roles">Job roles</a>
       {% if token %}
-        <a href="/logout">Logout</a>
+        <form action="/logout" method="post" style="display:inline; margin:0; padding:0;">
+          <button type="submit" style="background:none; border:none; color:inherit; font:inherit; cursor:pointer; padding:0;">Logout</button>
+        </form>
       {% else %}
         <a href="/login">Login</a>
       {% endif %}

@@ -30,7 +30,7 @@ router.post("/login", async (req: Request, res: Response) => {
 		const token = await authService.login(email as string, password as string);
 		// Store token in a cookie so server-side routes can read it
 		res.cookie("token", token, {
-			httpOnly: false,
+			httpOnly: true,
 			sameSite: "strict",
 			maxAge: 8 * 60 * 60 * 1000, // 8 hours
 		});
@@ -46,7 +46,8 @@ router.post("/login", async (req: Request, res: Response) => {
 	}
 });
 
-router.get("/logout", (_req: Request, res: Response) => {
+
+router.post("/logout", (_req: Request, res: Response) => {
 	res.clearCookie("token");
 	res.redirect("/");
 });

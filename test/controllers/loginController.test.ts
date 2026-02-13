@@ -54,3 +54,27 @@ describe("GET /login", () => {
 		expect(response.status).toBe(200);
 	});
 });
+
+describe("POST /logout", () => {
+	it("should clear the token cookie and redirect to home", async () => {
+		const response = await request(app)
+			.post("/logout")
+			.set("Cookie", ["token=fake-token"]);
+
+		expect(response.status).toBe(302);
+		expect(response.header.location).toBe("/");
+		const setCookieHeader = response.headers["set-cookie"];
+		const setCookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
+		const setCookie = setCookies.find((c: string) => c && c.startsWith("token="));
+		expect(setCookie).toBeDefined();
+		expect(setCookie).toMatch(/token=;/);
+	});
+
+	it("should redirect to home even if no token cookie is present", async () => {
+		const response = await request(app)
+			.post("/logout");
+
+		expect(response.status).toBe(302);
+		expect(response.header.location).toBe("/");
+	});
+});
