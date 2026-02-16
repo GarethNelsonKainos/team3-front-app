@@ -69,9 +69,7 @@ describe("POST /logout", () => {
 		const setCookies = Array.isArray(setCookieHeader)
 			? setCookieHeader
 			: [setCookieHeader];
-		const setCookie = setCookies.find(
-			(c: string) => c && c.startsWith("token="),
-		);
+		const setCookie = setCookies.find((c: string) => c?.startsWith("token="));
 		expect(setCookie).toBeDefined();
 		expect(setCookie).toMatch(/token=;/);
 	});
