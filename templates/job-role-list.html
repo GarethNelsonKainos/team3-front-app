@@ -59,8 +59,7 @@
                     type="checkbox"
                     name="capability"
                     value="{{ capability }}"
-                    {% if filters.capability and (capability in filters.capability) %}checked{% endif %}
-                  >
+                    {% if filters.capability and (capability in filters.capability) %}checked{% endif %}>
                   <span>{{ capability }}</span>
                 </label>
               {% endfor %}
@@ -77,8 +76,7 @@
                     type="checkbox"
                     name="band"
                     value="{{ band }}"
-                    {% if filters.band and (band in filters.band) %}checked{% endif %}
-                  >
+                    {% if filters.band and (band in filters.band) %}checked{% endif %}>
                   <span>{{ band }}</span>
                 </label>
               {% endfor %}
