@@ -32,9 +32,7 @@ router.post("/register", async (req: Request, res: Response) => {
 		res.redirect("/login");
 	} catch (err) {
 		console.error("Registration failed", err);
-		res
-			.status(400)
-			.render("register.html", {
+		res.status(400).render("register.html", {
 				error: "Registration failed. Please try again.",
 				email,
 			});
