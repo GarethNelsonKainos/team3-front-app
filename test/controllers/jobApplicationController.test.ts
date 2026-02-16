@@ -2,6 +2,8 @@ import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { app } from "../../src/index";
 
+process.env.FEATURE_JOB_APPLICATIONS = "true";
+
 describe("GET /job-applications", () => {
 	it("should render the job applications page with mock data", async () => {
 		const response = await request(app).get("/job-applications");
