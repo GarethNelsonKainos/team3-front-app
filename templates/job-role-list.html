@@ -16,6 +16,80 @@
       </div>
     </section>
     <div class="container page-section">
+      {% if showRoleFilteringUI %}
+      <div class="page-card" style="margin-bottom: 20px;">
+        <form action="/job-roles" method="get" class="filter-form">
+          <div class="form-field">
+            <label for="filter-role-name">Role name</label>
+            <input
+              type="text"
+              id="filter-role-name"
+              name="roleName"
+              value="{{ filters.roleName or '' }}"
+              placeholder="e.g. Software Engineer"
+            >
+          </div>
+          <div class="form-field">
+            <label for="filter-location">Location</label>
+            <input
+              type="text"
+              id="filter-location"
+              name="location"
+              value="{{ filters.location or '' }}"
+              placeholder="e.g. Belfast"
+            >
+          </div>
+          <div class="form-field">
+            <label for="filter-closing-date">Closing date</label>
+            <input
+              type="text"
+              id="filter-closing-date"
+              name="closingDate"
+              value="{{ filters.closingDate or '' }}"
+              placeholder="e.g. 2026-03-01"
+            >
+          </div>
+          {% if capabilityOptions and capabilityOptions.length > 0 %}
+          <fieldset class="filter-fieldset">
+            <legend>Capability</legend>
+            <div class="filter-options">
+              {% for capability in capabilityOptions %}
+                <label class="filter-option">
+                  <input
+                    type="checkbox"
+                    name="capability"
+                    value="{{ capability }}"
+                    {% if filters.capability and (capability in filters.capability) %}checked{% endif %}>
+                  <span>{{ capability }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+          {% endif %}
+          {% if bandOptions and bandOptions.length > 0 %}
+          <fieldset class="filter-fieldset">
+            <legend>Band</legend>
+            <div class="filter-options">
+              {% for band in bandOptions %}
+                <label class="filter-option">
+                  <input
+                    type="checkbox"
+                    name="band"
+                    value="{{ band }}"
+                    {% if filters.band and (band in filters.band) %}checked{% endif %}>
+                  <span>{{ band }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+          {% endif %}
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button type="submit" class="cta-button">Apply filters</button>
+            <a class="text-link" href="/job-roles">Clear filters</a>
+          </div>
+        </form>
+      </div>
+      {% endif %}
       {% if roles and roles.length > 0 %}
         <div class="page-card">
           <table class="job-roles-table">

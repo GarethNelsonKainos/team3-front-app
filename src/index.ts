@@ -1,4 +1,5 @@
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import express, {
 	type NextFunction,
 	type Request,
@@ -7,6 +8,8 @@ import express, {
 import nunjucks from "nunjucks";
 import jobRoleController from "./controllers/jobRoleController.js";
 import loginController from "./controllers/loginController.js";
+
+dotenv.config();
 
 const app = express();
 
@@ -41,6 +44,7 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 
 export { app };
 
-app.listen(3000, () => {
-	console.log("Server running on http://localhost:3000");
+const port = Number(process.env.PORT) || 3001;
+app.listen(port, () => {
+	console.log(`Server running on http://localhost:${port}`);
 });
