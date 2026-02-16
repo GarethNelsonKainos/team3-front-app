@@ -13,7 +13,7 @@
   <div class="hero container">
     <h1>Welcome to Kainos Careers</h1>
     <p>View open roles across Kainos.</p>
-    {% if token %}
+    {% if showJobApplicationsUI and token %}
       <p><a href="/job-applications" class="cta-button">View My Applications</a></p>
     {% endif %}
   </div>

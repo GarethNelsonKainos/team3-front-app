@@ -32,10 +32,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(jobRoleController);
 app.use(loginController);
-app.use(jobApplicationController);
+const showJobApplicationsUI = process.env.FEATURE_JOB_APPLICATIONS === "true";
+if (showJobApplicationsUI) {
+	app.use(jobApplicationController);
+}
 
 app.get("/", (_req: Request, res: Response) => {
-	res.render("index.html");
+	res.render("index.html", { showJobApplicationsUI });
 });
 
 app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
