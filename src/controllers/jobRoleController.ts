@@ -1,14 +1,17 @@
-
 import { type Request, type Response, Router } from "express";
 import jobRoleService from "../services/jobRoleService.js";
 
 // Helper functions for query param parsing
 function getString(value: unknown): string | undefined {
-	return typeof value === "string" && value.trim().length > 0 ? value.trim() : undefined;
+	return typeof value === "string" && value.trim().length > 0
+		? value.trim()
+		: undefined;
 }
 function getStringArray(value: unknown): string[] {
 	if (Array.isArray(value)) {
-		return value.filter((item) => typeof item === "string" && item.trim().length > 0).map((item) => item.trim());
+		return value
+			.filter((item) => typeof item === "string" && item.trim().length > 0)
+			.map((item) => item.trim());
 	}
 	if (typeof value === "string" && value.trim().length > 0) {
 		return [value.trim()];
