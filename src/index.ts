@@ -46,7 +46,7 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 
 export { app };
 
-const port = Number(process.env.PORT) || 3001;
+const port = Number(process.env.PORT);
 app.listen(port, () => {
 	console.log(`Server running on http://localhost:${port}`);
 });
