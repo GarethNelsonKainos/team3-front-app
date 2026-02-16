@@ -1,26 +1,27 @@
+
 import { type Request, type Response, Router } from "express";
 import jobRoleService from "../services/jobRoleService.js";
+
+// Helper functions for query param parsing
+function getString(value: unknown): string | undefined {
+	return typeof value === "string" && value.trim().length > 0 ? value.trim() : undefined;
+}
+function getStringArray(value: unknown): string[] {
+	if (Array.isArray(value)) {
+		return value.filter((item) => typeof item === "string" && item.trim().length > 0).map((item) => item.trim());
+	}
+	if (typeof value === "string" && value.trim().length > 0) {
+		return [value.trim()];
+	}
+	return [];
+}
+
+const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === "true";
 
 const router = Router();
 
 router.get("/job-roles", async (req: Request, res: Response) => {
 	try {
-		const getString = (value: unknown) =>
-			typeof value === "string" && value.trim().length > 0
-				? value.trim()
-				: undefined;
-		const getStringArray = (value: unknown) => {
-			if (Array.isArray(value)) {
-				return value
-					.filter((item) => typeof item === "string" && item.trim().length > 0)
-					.map((item) => item.trim());
-			}
-			if (typeof value === "string" && value.trim().length > 0) {
-				return [value.trim()];
-			}
-			return [];
-		};
-
 		const capability = getStringArray(req.query.capability);
 		const band = getStringArray(req.query.band);
 		const filters = {
@@ -47,7 +48,6 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 					.filter((value): value is string => Boolean(value)),
 			),
 		).sort();
-		const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === "true";
 		res.render("job-role-list.html", {
 			roles,
 			filters,
@@ -57,7 +57,6 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		});
 	} catch (err) {
 		console.error("Failed to load job roles", err);
-		const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === "true";
 		res.render("job-role-list.html", {
 			roles: [],
 			filters: {
