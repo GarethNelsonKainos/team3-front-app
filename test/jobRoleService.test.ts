@@ -10,6 +10,7 @@ vi.mock("axios", () => ({
 	},
 }));
 const mockedAxios = axios as unknown as { get: ReturnType<typeof vi.fn> };
+const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:3001";
 
 afterEach(() => {
 	vi.clearAllMocks();
@@ -52,7 +53,7 @@ describe("getJobRoleById", () => {
 		mockedAxios.get.mockResolvedValue({ data: mockRole });
 		const result = await jobRoleService.getJobRoleById(123);
 		expect(mockedAxios.get).toHaveBeenCalledWith(
-			"http://localhost:3000/api/job-roles/123",
+			`${apiBaseUrl}/api/job-roles/123`,
 		);
 		expect(result).toEqual(mockRole);
 	});
