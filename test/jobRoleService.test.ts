@@ -52,7 +52,7 @@ describe("getJobRoleById", () => {
 		mockedAxios.get.mockResolvedValue({ data: mockRole });
 		const result = await jobRoleService.getJobRoleById(123);
 		expect(mockedAxios.get).toHaveBeenCalledWith(
-			"http://localhost:3001/api/job-roles/123",
+			"http://localhost:3000/api/job-roles/123",
 		);
 		expect(result).toEqual(mockRole);
 	});

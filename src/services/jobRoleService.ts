@@ -22,11 +22,35 @@ export interface JobRoleResponse {
 	};
 }
 
-const API_BASE = process.env.API_BASE_URL || "http://localhost:3001";
+export interface JobRoleFilters {
+	roleName?: string;
+	location?: string;
+	closingDate?: string;
+	capability?: string[];
+	band?: string[];
+}
 
-export async function getOpenJobRoles(): Promise<JobRoleResponse[]> {
+const API_BASE = process.env.API_BASE_URL || "http://localhost:3000";
+
+export async function getOpenJobRoles(
+	filters: JobRoleFilters = {},
+): Promise<JobRoleResponse[]> {
 	const url = `${API_BASE}/api/job-roles/open`;
-	const resp = await axios.get<JobRoleResponse[]>(url);
+	const params = new URLSearchParams();
+	if (filters.roleName) params.set("roleName", filters.roleName);
+	if (filters.location) params.set("location", filters.location);
+	if (filters.closingDate) params.set("closingDate", filters.closingDate);
+	if (filters.capability) {
+		for (const value of filters.capability) {
+			params.append("capability", value);
+		}
+	}
+	if (filters.band) {
+		for (const value of filters.band) {
+			params.append("band", value);
+		}
+	}
+	const resp = await axios.get<JobRoleResponse[]>(url, { params });
 	return resp.data || [];
 }
 
@@ -39,6 +63,9 @@ export async function getJobRoleById(
 		return resp.data;
 	} catch (err: any ) {
 		if (err.response && err.response.status === 404) {
+	} catch (err: unknown) {
+		const axiosErr = err as { response?: { status?: number } };
+		if (axiosErr.response && axiosErr.response.status === 404) {
 			return undefined;
 		}
 		throw err;

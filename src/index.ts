@@ -1,5 +1,6 @@
 import axios from "axios";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import express, {
 	type NextFunction,
 	type Request,
@@ -12,6 +13,7 @@ import loginController from "./controllers/loginController.js";
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL =
 	process.env.API_BASE_URL || "http://localhost:3000/api";
+dotenv.config();
 
 const app = express();
 
@@ -48,4 +50,7 @@ export { app };
 
 app.listen(3001, () => {
 	console.log("Server running on http://localhost:3001");
+const port = Number(process.env.PORT) || 3001;
+app.listen(port, () => {
+	console.log(`Server running on http://localhost:${port}`);
 });

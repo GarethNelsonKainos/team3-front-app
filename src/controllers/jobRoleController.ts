@@ -6,6 +6,26 @@ interface JobRole {
 	[key: string]: any;
 }
 
+// Helper functions for query param parsing
+function getString(value: unknown): string | undefined {
+	return typeof value === "string" && value.trim().length > 0
+		? value.trim()
+		: undefined;
+}
+function getStringArray(value: unknown): string[] {
+	if (Array.isArray(value)) {
+		return value
+			.filter((item) => typeof item === "string" && item.trim().length > 0)
+			.map((item) => item.trim());
+	}
+	if (typeof value === "string" && value.trim().length > 0) {
+		return [value.trim()];
+	}
+	return [];
+}
+
+const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === "true";
+
 const router = Router();
 
 // Helper to forward JWT cookie to backend API
@@ -29,6 +49,56 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			return res.redirect("/login");
 		}
 		res.render("job-role-list.html", { roles: [] });
+router.get("/job-roles", async (req: Request, res: Response) => {
+	try {
+		const capability = getStringArray(req.query.capability);
+		const band = getStringArray(req.query.band);
+		const filters = {
+			roleName: getString(req.query.roleName),
+			location: getString(req.query.location),
+			closingDate: getString(req.query.closingDate),
+			capability: capability.length > 0 ? capability : undefined,
+			band: band.length > 0 ? band : undefined,
+		};
+
+		let roles = await jobRoleService.getOpenJobRoles(filters);
+		if (!Array.isArray(roles)) roles = [];
+		const capabilityOptions = Array.from(
+			new Set(
+				roles
+					.map((role) => role.capability?.capabilityName)
+					.filter((value): value is string => Boolean(value)),
+			),
+		).sort();
+		const bandOptions = Array.from(
+			new Set(
+				roles
+					.map((role) => role.band?.bandName)
+					.filter((value): value is string => Boolean(value)),
+			),
+		).sort();
+		res.render("job-role-list.html", {
+			roles,
+			filters,
+			capabilityOptions,
+			bandOptions,
+			showRoleFilteringUI,
+		});
+	} catch (err) {
+		console.error("Failed to load job roles", err);
+		res.render("job-role-list.html", {
+			roles: [],
+			filters: {
+				roleName: undefined,
+				location: undefined,
+				closingDate: undefined,
+				capability: undefined,
+				band: undefined,
+			},
+			capabilityOptions: [],
+			bandOptions: [],
+			showRoleFilteringUI,
+		});
 	}
 });
 

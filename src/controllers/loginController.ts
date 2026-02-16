@@ -35,10 +35,14 @@ router.post("/login", async (req: Request, res: Response) => {
 			maxAge: 8 * 60 * 60 * 1000, // 8 hours
 		});
 		res.redirect("/job-roles");
-	} catch (err: any) {
-		console.error("Login error", err?.response?.status, err?.message);
+	} catch (err: unknown) {
+		const axiosErr = err as {
+			response?: { status?: number };
+			message?: string;
+		};
+		console.error("Login error", axiosErr.response?.status, axiosErr.message);
 		const message =
-			err?.response?.status === 401
+			axiosErr.response?.status === 401
 				? "Invalid email or password."
 				: "Login failed. Please try again.";
 		res.render("login.html", { error: message, email: req.body.email });
