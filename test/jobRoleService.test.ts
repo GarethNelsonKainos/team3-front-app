@@ -8,7 +8,7 @@ vi.mock("axios", () => ({
 	},
 }));
 const mockedAxios = axios as unknown as { get: ReturnType<typeof vi.fn> };
-const apiBaseUrl = "http://localhost:3001";
+const apiBaseUrl = "http://example.test";
 
 const loadJobRoleService = async () => {
 	vi.resetModules();
@@ -32,6 +32,10 @@ describe("getOpenJobRoles", () => {
 			data: [],
 		});
 		const result = await jobRoleService.getOpenJobRoles();
+		expect(mockedAxios.get).toHaveBeenCalledWith(
+			`${apiBaseUrl}/api/job-roles/open`,
+			{ params: new URLSearchParams() },
+		);
 		expect(result).toEqual([]);
 	});
 });
