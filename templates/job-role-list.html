@@ -16,6 +16,7 @@
       </div>
     </section>
     <div class="container page-section">
+      {% if showRoleFilteringUI %}
       <div class="page-card" style="margin-bottom: 20px;">
         <form action="/job-roles" method="get" class="filter-form">
           <div class="form-field">
@@ -90,6 +91,7 @@
           </div>
         </form>
       </div>
+      {% endif %}
       {% if roles and roles.length > 0 %}
         <div class="page-card">
           <table class="job-roles-table">

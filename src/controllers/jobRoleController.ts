@@ -47,14 +47,17 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 					.filter((value): value is string => Boolean(value)),
 			),
 		).sort();
+		const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === 'true';
 		res.render("job-role-list.html", {
 			roles,
 			filters,
 			capabilityOptions,
 			bandOptions,
+			showRoleFilteringUI,
 		});
 	} catch (err) {
 		console.error("Failed to load job roles", err);
+		const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === 'true';
 		res.render("job-role-list.html", {
 			roles: [],
 			filters: {
@@ -66,6 +69,7 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			},
 			capabilityOptions: [],
 			bandOptions: [],
+			showRoleFilteringUI,
 		});
 	}
 });

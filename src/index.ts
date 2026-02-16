@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import express, {
 	type NextFunction,
@@ -7,6 +8,8 @@ import express, {
 import nunjucks from "nunjucks";
 import jobRoleController from "./controllers/jobRoleController.js";
 import loginController from "./controllers/loginController.js";
+
+dotenv.config();
 
 const app = express();
 
