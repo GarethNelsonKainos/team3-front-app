@@ -29,6 +29,8 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			closingDate: getString(req.query.closingDate),
 			capability: capability.length > 0 ? capability : undefined,
 			band: band.length > 0 ? band : undefined,
+			orderBy: getString(req.query.orderBy),
+			orderDir: getString(req.query.orderDir) as 'asc' | 'desc' | undefined,
 		};
 
 		let roles = await jobRoleService.getOpenJobRoles(filters);
@@ -47,25 +49,36 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 					.filter((value): value is string => Boolean(value)),
 			),
 		).sort();
+		// Build base query string from filters (excluding sort) for sort links
+		const baseParams = new URLSearchParams();
+		if (filters.roleName) baseParams.set('roleName', filters.roleName);
+		if (filters.location) baseParams.set('location', filters.location);
+		if (filters.closingDate) baseParams.set('closingDate', filters.closingDate);
+		if (filters.capability) {
+			for (const c of filters.capability) baseParams.append('capability', c);
+		}
+		if (filters.band) {
+			for (const b of filters.band) baseParams.append('band', b);
+		}
+		const baseQuery = baseParams.toString();
+
 		res.render("job-role-list.html", {
 			roles,
-			filters,
+			filters: filters || {},
 			capabilityOptions,
 			bandOptions,
+			orderBy: filters.orderBy,
+			orderDir: filters.orderDir,
+			baseQuery,
 		});
 	} catch (err) {
 		console.error("Failed to load job roles", err);
 		res.render("job-role-list.html", {
 			roles: [],
-			filters: {
-				roleName: undefined,
-				location: undefined,
-				closingDate: undefined,
-				capability: undefined,
-				band: undefined,
-			},
+			filters: {},
 			capabilityOptions: [],
 			bandOptions: [],
+			baseQuery: '',
 		});
 	}
 });
