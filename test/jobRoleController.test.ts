@@ -1,10 +1,11 @@
 import path from "node:path";
+import axios from "axios";
+import cookieParser from "cookie-parser";
 import express from "express";
 import nunjucks from "nunjucks";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import jobRoleController from "../src/controllers/jobRoleController";
-import jobRoleService from "../src/services/jobRoleService";
 
 // Mock data for all tests
 const mockRoles = [
@@ -25,11 +26,12 @@ const mockRoleDetail = {
 	numberOfOpenPositions: 2,
 };
 
-vi.mock("../src/services/jobRoleService");
+vi.mock("axios");
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Set up Nunjucks for template rendering in tests
 nunjucks.configure(path.join(__dirname, "../templates"), {
@@ -45,7 +47,7 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles should render job roles list", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(axios.get).mockResolvedValue({ data: mockRoles } as any);
 		const res = await request(app).get("/job-roles");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Open job roles");
@@ -54,7 +56,7 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles/:id should render job role detail", async () => {
-		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(axios.get).mockResolvedValue({ data: mockRoleDetail } as any);
 		const res = await request(app).get("/job-roles/1");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Dev");
@@ -63,7 +65,7 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles/:id should show not found if role missing", async () => {
-		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(undefined);
+		vi.mocked(axios.get).mockRejectedValue({ response: { status: 404 } });
 		const res = await request(app).get("/job-roles/999");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Job role not found");
@@ -76,23 +78,24 @@ describe("jobRoleController apply routes", () => {
 	});
 
 	it("GET /job-roles/:id/apply should render apply form if role exists", async () => {
-		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(axios.get).mockResolvedValue({ data: mockRoleDetail } as any);
 		const res = await request(app).get("/job-roles/1/apply");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Apply for Dev");
-		expect(res.text).toContain("Upload your CV");
+		expect(res.text).toContain("Upload CV");
 		expect(res.text).toContain("Submit application");
 	});
 
 	it("GET /job-roles/:id/apply should show not found if role missing", async () => {
-		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(undefined);
+		vi.mocked(axios.get).mockRejectedValue({ response: { status: 404 } });
 		const res = await request(app).get("/job-roles/999/apply");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Job role not found");
 	});
 
 	it("POST /job-roles/:id/apply should show confirmation if role exists", async () => {
-		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(axios.get).mockResolvedValue({ data: mockRoleDetail } as any);
+		vi.mocked(axios.post).mockResolvedValue({ data: mockRoleDetail } as any);
 		const res = await request(app)
 			.post("/job-roles/1/apply")
 			.type("form")
@@ -103,7 +106,7 @@ describe("jobRoleController apply routes", () => {
 	});
 
 	it("POST /job-roles/:id/apply should show not found if role missing", async () => {
-		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(undefined);
+		vi.mocked(axios.post).mockRejectedValue({ response: { status: 404 } });
 		const res = await request(app)
 			.post("/job-roles/999/apply")
 			.type("form")
@@ -113,22 +116,26 @@ describe("jobRoleController apply routes", () => {
 	});
 
 	it("GET /job-roles/:id should show apply button if open and positions > 0", async () => {
-		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue({
-			...mockRoleDetail,
-			status: "open",
-			numberOfOpenPositions: 2,
-		});
+		vi.mocked(axios.get).mockResolvedValue({
+			data: {
+				...mockRoleDetail,
+				status: "open",
+				numberOfOpenPositions: 2,
+			},
+		} as any);
 		const res = await request(app).get("/job-roles/1");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Apply for this role");
 	});
 
 	it("GET /job-roles/:id should NOT show apply button if closed or no positions", async () => {
-		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue({
-			...mockRoleDetail,
-			status: "closed",
-			numberOfOpenPositions: 0,
-		});
+		vi.mocked(axios.get).mockResolvedValue({
+			data: {
+				...mockRoleDetail,
+				status: "closed",
+				numberOfOpenPositions: 0,
+			},
+		} as any);
 		const res = await request(app).get("/job-roles/1");
 		expect(res.status).toBe(200);
 		expect(res.text).not.toContain("Apply for this role");

@@ -1,3 +1,4 @@
+import axios from "axios";
 import cookieParser from "cookie-parser";
 import express, {
 	type NextFunction,
@@ -7,6 +8,10 @@ import express, {
 import nunjucks from "nunjucks";
 import jobRoleController from "./controllers/jobRoleController.js";
 import loginController from "./controllers/loginController.js";
+
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL =
+	process.env.API_BASE_URL || "http://localhost:3000/api";
 
 const app = express();
 
@@ -41,6 +46,6 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 
 export { app };
 
-app.listen(3000, () => {
-	console.log("Server running on http://localhost:3000");
+app.listen(3001, () => {
+	console.log("Server running on http://localhost:3001");
 });

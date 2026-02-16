@@ -37,7 +37,7 @@ export async function getJobRoleById(
 	try {
 		const resp = await axios.get<JobRoleResponse>(url);
 		return resp.data;
-	} catch (err: any) {
+	} catch (err: any ) {
 		if (err.response && err.response.status === 404) {
 			return undefined;
 		}
