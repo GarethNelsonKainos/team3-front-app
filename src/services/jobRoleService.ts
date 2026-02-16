@@ -37,6 +37,7 @@ const API_BASE = process.env.API_BASE_URL;
 
 export async function getOpenJobRoles(
 	filters: JobRoleFilters = {},
+	token?: string,
 ): Promise<JobRoleResponse[]> {
 	const url = `${API_BASE}/api/job-roles/open`;
 	const params = new URLSearchParams();
@@ -53,16 +54,19 @@ export async function getOpenJobRoles(
 			params.append("band", value);
 		}
 	}
-	const resp = await axios.get<JobRoleResponse[]>(url, { params });
+	const headers = token ? { Authorization: `Bearer ${token}` } : {};
+	const resp = await axios.get<JobRoleResponse[]>(url, { params, headers });
 	return resp.data || [];
 }
 
 export async function getJobRoleById(
 	jobRoleId: number | string,
+	token?: string,
 ): Promise<JobRoleResponse | undefined> {
 	const url = `${API_BASE}/api/job-roles/${jobRoleId}`;
 	try {
-		const resp = await axios.get<JobRoleResponse>(url);
+		const headers = token ? { Authorization: `Bearer ${token}` } : {};
+		const resp = await axios.get<JobRoleResponse>(url, { headers });
 		return resp.data;
 	} catch (err: unknown) {
 		const axiosErr = err as { response?: { status?: number } };
