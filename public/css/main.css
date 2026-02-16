@@ -1,3 +1,14 @@
+.sort-arrow {
+	color: #b0b8d1;
+	font-size: 0.9em;
+	margin-left: 4px;
+	font-weight: 400;
+	transition: color 0.2s, font-weight 0.2s;
+}
+.sort-arrow.active {
+	color: var(--kainos-blue);
+	font-weight: 700;
+}
 /* Job role details styling */
 .job-role-details {
 	display: grid;
@@ -631,6 +642,21 @@ body {
 	align-items: center;
 	gap: 8px;
 	font-size: 0.95rem;
+}
+
+.sortable-col {
+	color: var(--kainos-blue);
+	text-decoration: none;
+	cursor: pointer;
+	font-weight: 600;
+}
+.sortable-col:hover {
+	text-decoration: underline;
+}
+.sortable-col.sorted-asc span,
+.sortable-col.sorted-desc span {
+	margin-left: 4px;
+	font-size: 0.9em;
 }
 
 .button {
