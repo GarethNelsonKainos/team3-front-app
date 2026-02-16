@@ -33,9 +33,9 @@ router.post("/register", async (req: Request, res: Response) => {
 	} catch (err) {
 		console.error("Registration failed", err);
 		res.status(400).render("register.html", {
-				error: "Registration failed. Please try again.",
-				email,
-			});
+			error: "Registration failed. Please try again.",
+			email,
+		});
 	}
 });
 
