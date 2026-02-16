@@ -1,6 +1,6 @@
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { app } from "../../src/index";
+import { app } from "../../src/index"; 
 
 describe("GET /job-applications", () => {
 	it("should render the job applications page with mock data", async () => {
