@@ -24,9 +24,12 @@ const mockApplications = [
 	},
 ];
 
-router.get("/job-applications", (_req: Request, res: Response) => {
-	// In a real app, check if user is logged in and fetch their applications
-	// For now, just render with mock data
+router.get("/job-applications", (req: Request, res: Response) => {
+	const token = req.cookies?.token;
+	if (!token) {
+		return res.redirect("/login");
+	}
+	// In a real app, fetch applications for the logged-in user
 	res.render("job-applications.html", { applications: mockApplications });
 });
 
