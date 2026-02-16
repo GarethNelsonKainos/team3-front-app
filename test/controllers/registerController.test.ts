@@ -53,10 +53,7 @@ describe("POST /register", () => {
 	});
 
 	it("should return error with missing both email and password", async () => {
-		const response = await request(app)
-			.post("/register")
-			.type("form")
-			.send({}); // Missing both
+		const response = await request(app).post("/register").type("form").send({}); // Missing both
 
 		expect(response.status).toBe(400);
 		expect(response.text).toContain(
@@ -137,7 +134,7 @@ describe("POST /register", () => {
 describe("GET /register", () => {
 	it("should return the registration page", async () => {
 		const response = await request(app).get("/register");
-		
+
 		expect(response.status).toBe(200);
 		expect(response.text).toBeTruthy();
 	});
