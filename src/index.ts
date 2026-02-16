@@ -6,6 +6,7 @@ import express, {
 	type Response,
 } from "express";
 import nunjucks from "nunjucks";
+import jobApplicationController from "./controllers/jobApplicationController.js";
 import jobRoleController from "./controllers/jobRoleController.js";
 import loginController from "./controllers/loginController.js";
 
@@ -31,6 +32,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(jobRoleController);
 app.use(loginController);
+app.use(jobApplicationController);
 
 app.get("/", (_req: Request, res: Response) => {
 	res.render("index.html");
