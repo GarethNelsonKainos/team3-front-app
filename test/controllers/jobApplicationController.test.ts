@@ -1,8 +1,18 @@
+import path from "node:path";
+import express from "express";
+import nunjucks from "nunjucks";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { app } from "../../src/index";
+import jobApplicationController from "../../src/controllers/jobApplicationController";
 
-process.env.FEATURE_JOB_APPLICATIONS = "true";
+const app = express();
+
+nunjucks.configure(path.join(__dirname, "../../templates"), {
+	autoescape: true,
+	express: app,
+});
+
+app.use("/", jobApplicationController);
 
 describe("GET /job-applications", () => {
 	it("should render the job applications page with mock data", async () => {
