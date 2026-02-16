@@ -99,9 +99,7 @@ describe("POST /register", () => {
 			.send({ email: "existing@example.com", password: "password123" });
 
 		expect(response.status).toBe(400);
-		expect(response.text).toContain(
-			"Password must be at least 8 characters",
-		);
+		expect(response.text).toContain("Password must be at least 8 characters");
 		expect(authService.register).toHaveBeenCalledWith(
 			"existing@example.com",
 			"password123",

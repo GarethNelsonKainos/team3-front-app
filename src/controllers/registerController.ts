@@ -29,13 +29,17 @@ router.post("/register", async (req: Request, res: Response) => {
 	}
 	try {
 		await register(email as string, password as string);
-		res.render("login.html", { success: "Registration successful. Please log in.", error: null, email });
+		res.render("login.html", {
+			success: "Registration successful. Please log in.",
+			error: null,
+			email,
+		});
 	} catch (err) {
 		console.error("Registration error", err);
 		const apiMessage =
 			typeof err === "object" && err !== null
-				? (err as { response?: { data?: { message?: string } } }).response
-						?.data?.message
+				? (err as { response?: { data?: { message?: string } } }).response?.data
+						?.message
 				: undefined;
 		const message =
 			apiMessage ||
