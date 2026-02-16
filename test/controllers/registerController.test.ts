@@ -18,8 +18,8 @@ describe("POST /register", () => {
 			.type("form")
 			.send({ email: "newuser@example.com", password: "password123" });
 
-		expect(response.status).toBe(302);
-		expect(response.header.location).toBe("/login");
+		expect(response.status).toBe(200);
+		expect(response.text).toContain("Registration successful. Please log in.");
 		expect(authService.register).toHaveBeenCalledWith(
 			"newuser@example.com",
 			"password123",
@@ -89,9 +89,9 @@ describe("POST /register", () => {
 	});
 
 	it("should return error when registration service fails", async () => {
-		vi.mocked(authService.register).mockRejectedValue(
-			new Error("Registration error"),
-		);
+		vi.mocked(authService.register).mockRejectedValue({
+			response: { data: { message: "Password must be at least 8 characters" } },
+		});
 
 		const response = await request(app)
 			.post("/register")
@@ -99,7 +99,9 @@ describe("POST /register", () => {
 			.send({ email: "existing@example.com", password: "password123" });
 
 		expect(response.status).toBe(400);
-		expect(response.text).toContain("Registration failed. Please try again.");
+		expect(response.text).toContain(
+			"Password must be at least 8 characters",
+		);
 		expect(authService.register).toHaveBeenCalledWith(
 			"existing@example.com",
 			"password123",

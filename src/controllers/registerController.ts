@@ -29,13 +29,23 @@ router.post("/register", async (req: Request, res: Response) => {
 	}
 	try {
 		await register(email as string, password as string);
-		res.redirect("/login");
+		res.render("login.html", { success: "Registration successful. Please log in.", error: null, email });
 	} catch (err) {
-		console.error("Registration failed", err);
+		console.error("Registration error", err);
+		const apiMessage =
+			typeof err === "object" && err !== null
+				? (err as { response?: { data?: { message?: string } } }).response
+						?.data?.message
+				: undefined;
+		const message =
+			apiMessage ||
+			(err instanceof Error ? err.message : undefined) ||
+			"Registration failed. Please try again.";
 		res.status(400).render("register.html", {
-			error: "Registration failed. Please try again.",
-			email,
+			error: message,
+			email: req.body.email,
 		});
+		return;
 	}
 });
 

@@ -24,6 +24,11 @@
           {{ error }}
         </div>
       {% endif %}
+      {% if success %}
+        <div class="status-banner" style="background: rgba(40,167,69,0.12); border-color: rgba(40,167,69,0.4); color: #155724; margin-bottom: 16px;">
+          {{ success }}
+        </div>
+      {% endif %}
       <form class="login-form" action="/login" method="post" aria-labelledby="login-title">
         <div class="form-field">
           <label for="login-email">Email</label>
