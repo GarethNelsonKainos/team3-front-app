@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Job Applications</title>
+    {% include "partials/linktags.html" %}
+  </head>
+  <body>
+    {% include "partials/header.html" %}
+    <section class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Applications</p>
+        <h1 class="page-hero__title">My Job Applications</h1>
+        <p class="page-hero__subtitle">Track the status of your job applications.</p>
+      </div>
+    </section>
+    <div class="container page-section">
+      {% if applications and applications.length > 0 %}
+        <div class="page-card">
+          <table class="job-roles-table">
+            <caption>Your job applications</caption>
+            <thead>
+              <tr>
+                <th scope="col">Role name</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for application in applications %}
+                <tr>
+                  <td>
+                    <a class="table-link" href="/job-roles/{{ application.roleId }}">{{ application.roleName }}</a>
+                  </td>
+                  <td>{{ application.status }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="page-card">
+          <p>You have not submitted any job applications yet.</p>
+        </div>
+      {% endif %}
+    </div>
+    {% include "partials/footer.html" %}
+  </body>
+</html>
