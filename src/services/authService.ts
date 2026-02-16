@@ -10,4 +10,11 @@ export async function login(email: string, password: string): Promise<string> {
 	return resp.data.token;
 }
 
-export default { login };
+export async function register(email: string, password: string): Promise<void> {
+    await axios.post(`${API_BASE}/api/register`, {
+        email,
+        password,
+    });
+}
+
+export default { login, register };

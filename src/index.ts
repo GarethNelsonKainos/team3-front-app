@@ -7,6 +7,7 @@ import express, {
 import nunjucks from "nunjucks";
 import jobRoleController from "./controllers/jobRoleController.js";
 import loginController from "./controllers/loginController.js";
+import registerController from "./controllers/registerController.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(jobRoleController);
 app.use(loginController);
+app.use(registerController);
 
 app.get("/", (_req: Request, res: Response) => {
 	res.render("index.html");
