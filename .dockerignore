@@ -1,0 +1,10 @@
+# .dockerignore for team3-front-app
+node_modules
+npm-debug.log
+dist
+test
+*.md
+.git
+.gitignore
+.env
+coverage
