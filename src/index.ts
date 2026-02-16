@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import express, {
 	type NextFunction,
 	type Request,
