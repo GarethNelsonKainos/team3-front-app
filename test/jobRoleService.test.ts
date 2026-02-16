@@ -48,7 +48,10 @@ describe("getOpenJobRoles", () => {
 		const result = await jobRoleService.getOpenJobRoles({}, token);
 		expect(mockedAxios.get).toHaveBeenCalledWith(
 			`${apiBaseUrl}/api/job-roles/open`,
-			{ params: new URLSearchParams(), headers: { Authorization: `Bearer ${token}` } },
+			{
+				params: new URLSearchParams(),
+				headers: { Authorization: `Bearer ${token}` },
+			},
 		);
 		expect(result).toEqual([]);
 	});

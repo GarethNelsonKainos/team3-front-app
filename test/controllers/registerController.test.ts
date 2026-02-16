@@ -89,9 +89,14 @@ describe("POST /register", () => {
 	});
 
 	it("should return error when registration service fails", async () => {
-		vi.mocked(authService.register).mockRejectedValue({
-			response: { data: { message: "Password must be at least 8 characters" } },
-		});
+		const axiosError = {
+			isAxiosError: true,
+			response: {
+				status: 400,
+				data: { message: "Password must be at least 8 characters" },
+			},
+		};
+		vi.mocked(authService.register).mockRejectedValue(axiosError);
 
 		const response = await request(app)
 			.post("/register")
