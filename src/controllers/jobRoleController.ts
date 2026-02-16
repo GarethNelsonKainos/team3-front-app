@@ -34,7 +34,7 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			capability: capability.length > 0 ? capability : undefined,
 			band: band.length > 0 ? band : undefined,
 			orderBy: getString(req.query.orderBy),
-			orderDir: getString(req.query.orderDir) as 'asc' | 'desc' | undefined,
+			orderDir: getString(req.query.orderDir) as "asc" | "desc" | undefined,
 		};
 
 		let roles = await jobRoleService.getOpenJobRoles(filters);
@@ -55,18 +55,18 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		).sort();
 		// Build base query string from filters (excluding sort) for sort links
 		const baseParams = new URLSearchParams();
-		if (filters.roleName) baseParams.set('roleName', filters.roleName);
-		if (filters.location) baseParams.set('location', filters.location);
-		if (filters.closingDate) baseParams.set('closingDate', filters.closingDate);
+		if (filters.roleName) baseParams.set("roleName", filters.roleName);
+		if (filters.location) baseParams.set("location", filters.location);
+		if (filters.closingDate) baseParams.set("closingDate", filters.closingDate);
 		if (filters.capability) {
-			for (const c of filters.capability) baseParams.append('capability', c);
+			for (const c of filters.capability) baseParams.append("capability", c);
 		}
 		if (filters.band) {
-			for (const b of filters.band) baseParams.append('band', b);
+			for (const b of filters.band) baseParams.append("band", b);
 		}
 		const baseQuery = baseParams.toString();
 
-		const showOrderingUI = process.env.FEATURE_ORDERING_UI === 'true';
+		const showOrderingUI = process.env.FEATURE_ORDERING_UI === "true";
 		res.render("job-role-list.html", {
 			roles,
 			filters: filters || {},
@@ -80,13 +80,13 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		});
 	} catch (err) {
 		console.error("Failed to load job roles", err);
-		const showOrderingUI = process.env.FEATURE_ORDERING_UI === 'true';
+		const showOrderingUI = process.env.FEATURE_ORDERING_UI === "true";
 		res.render("job-role-list.html", {
 			roles: [],
 			filters: {},
 			capabilityOptions: [],
 			bandOptions: [],
-			baseQuery: '',
+			baseQuery: "",
 			showOrderingUI,
 		});
 	}
