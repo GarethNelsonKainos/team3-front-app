@@ -1,8 +1,6 @@
 import axios from "axios";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import jobRoleService, {
-	type JobRoleResponse,
-} from "../src/services/jobRoleService";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { JobRoleResponse } from "../src/services/jobRoleService";
 
 vi.mock("axios", () => ({
 	default: {
@@ -10,14 +8,26 @@ vi.mock("axios", () => ({
 	},
 }));
 const mockedAxios = axios as unknown as { get: ReturnType<typeof vi.fn> };
-const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:3001";
+const apiBaseUrl = "http://localhost:3001";
+
+const loadJobRoleService = async () => {
+	vi.resetModules();
+	const module = await import("../src/services/jobRoleService");
+	return module.default;
+};
+
+beforeEach(() => {
+	process.env.API_BASE_URL = apiBaseUrl;
+});
 
 afterEach(() => {
 	vi.clearAllMocks();
+	delete process.env.API_BASE_URL;
 });
 
 describe("getOpenJobRoles", () => {
 	it("returns empty array if no open roles", async () => {
+		const jobRoleService = await loadJobRoleService();
 		mockedAxios.get.mockResolvedValue({
 			data: [],
 		});
@@ -28,6 +38,7 @@ describe("getOpenJobRoles", () => {
 
 describe("getJobRoleById", () => {
 	it("calls the detail endpoint and returns role data", async () => {
+		const jobRoleService = await loadJobRoleService();
 		const mockRole: JobRoleResponse = {
 			jobRoleId: 1,
 			roleName: "Software Engineer",
