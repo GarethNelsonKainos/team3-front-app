@@ -8,7 +8,7 @@
   </head>
   <body>
     {% include "partials/header.html" %}
-{% import "macros/filters.njk" as filterMacros %}
+
 
     <section class="page-hero">
       <div class="container">
@@ -96,6 +96,7 @@
         <div class="page-card">
           <table class="job-roles-table">
             <caption>List of currently open job roles</caption>
+            {% if showOrderingUI %}
             <thead>
               <tr>
                 {% set columns = [
@@ -119,7 +120,7 @@
                       {% else %}
                         {% set nextDir = 'asc' %}
                       {% endif %}
-                      <a href="?{{ filterMacros.dict_to_query(filters, { orderBy: col.key, orderDir: nextDir }) }}"
+                      <a href="?{{ baseQuery }}{% if baseQuery %}&{% endif %}orderBy={{ col.key }}{% if nextDir %}&orderDir={{ nextDir }}{% endif %}"
                         class="sortable-col{% if isActive %} sorted-{{ orderDir }}{% endif %}">
                         {{ col.label }}
                         {% if isActive %}
@@ -133,25 +134,20 @@
                 {% endfor %}
               </tr>
             </thead>
+            {% else %}
+            <thead>
+              <tr>
+                <th scope="col">Role name</th>
+                <th scope="col">Specification</th>
+                <th scope="col">Location</th>
+                <th scope="col">Capability</th>
+                <th scope="col">Band</th>
+                <th scope="col">Closing date</th>
+              </tr>
+            </thead>
+            {% endif %}
             {# Helper macro to merge filters and sort into query string #}
-            {% macro dict_to_query(filters, sort) %}
-              {%- set params = [] -%}
-              {%- for k, v in filters.items() if v is not none and v != '' -%}
-                {%- if v is iterable and v is not string -%}
-                  {%- for item in v -%}
-                    {%- if item != '' -%}
-                      {{- params.append(k ~ '=' ~ item|urlencode) -}}
-                    {%- endif -%}
-                  {%- endfor -%}
-                {%- else -%}
-                  {{- params.append(k ~ '=' ~ v|urlencode) -}}
-                {%- endif -%}
-              {%- endfor -%}
-              {%- for k, v in sort.items() if v is not none and v != '' -%}
-                {{- params.append(k ~ '=' ~ v|urlencode) -}}
-              {%- endfor -%}
-              {{- params | join('&') -}}
-            {% endmacro %}
+
             <tbody>
               {% for role in roles %}
                 <tr>

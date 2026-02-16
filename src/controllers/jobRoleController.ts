@@ -66,6 +66,7 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		}
 		const baseQuery = baseParams.toString();
 
+		const showOrderingUI = process.env.FEATURE_ORDERING_UI === 'true';
 		res.render("job-role-list.html", {
 			roles,
 			filters: filters || {},
@@ -75,14 +76,18 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			orderBy: filters.orderBy,
 			orderDir: filters.orderDir,
 			baseQuery,
+			showOrderingUI,
 		});
 	} catch (err) {
 		console.error("Failed to load job roles", err);
+		const showOrderingUI = process.env.FEATURE_ORDERING_UI === 'true';
 		res.render("job-role-list.html", {
 			roles: [],
 			filters: {},
 			capabilityOptions: [],
 			bandOptions: [],
+			baseQuery: '',
+			showOrderingUI,
 		});
 	}
 });
