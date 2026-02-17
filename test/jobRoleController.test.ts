@@ -45,7 +45,10 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles should render job roles list", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
 		const res = await request(app).get("/job-roles");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Open job roles");
@@ -53,45 +56,114 @@ describe("jobRoleController", () => {
 		expect(res.text).toContain("QA");
 	});
 
+	it("GET /job-roles should show last link when total count exists", async () => {
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 25,
+		});
+		const res = await request(app).get("/job-roles");
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Page 1 of 3");
+		expect(res.text).toContain(">Last<");
+	});
+
+	it("GET /job-roles should hide last link when total count is missing", async () => {
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: undefined,
+		});
+		const res = await request(app).get("/job-roles");
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Page 1");
+		expect(res.text).not.toContain(">Last<");
+	});
+
 	it("GET /job-roles with valid ordering params should pass to service", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
 		const res = await request(app).get(
 			"/job-roles?orderBy=roleName&orderDir=asc",
 		);
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: "roleName", orderDir: "asc" }),
+			expect.objectContaining({
+				orderBy: "roleName",
+				orderDir: "asc",
+				limit: 11,
+				offset: 0,
+			}),
 		);
 	});
 
 	it("GET /job-roles with invalid orderDir should ignore param", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
 		const res = await request(app).get(
 			"/job-roles?orderBy=roleName&orderDir=random",
 		);
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: "roleName", orderDir: undefined }),
+			expect.objectContaining({
+				orderBy: "roleName",
+				orderDir: undefined,
+				limit: 11,
+				offset: 0,
+			}),
 		);
 	});
 
 	it("GET /job-roles with invalid orderBy should ignore param", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
 		const res = await request(app).get(
 			"/job-roles?orderBy=notAColumn&orderDir=asc",
 		);
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: undefined, orderDir: "asc" }),
+			expect.objectContaining({
+				orderBy: undefined,
+				orderDir: "asc",
+				limit: 11,
+				offset: 0,
+			}),
 		);
 	});
 
 	it("GET /job-roles with no ordering params should not set them", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
 		const res = await request(app).get("/job-roles");
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: undefined, orderDir: undefined }),
+			expect.objectContaining({
+				orderBy: undefined,
+				orderDir: undefined,
+				limit: 11,
+				offset: 0,
+			}),
+		);
+	});
+
+	it("GET /job-roles page=2 should set offset to 10", async () => {
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
+		const res = await request(app).get("/job-roles?page=2");
+		expect(res.status).toBe(200);
+		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
+			expect.objectContaining({
+				limit: 11,
+				offset: 10,
+			}),
 		);
 	});
 

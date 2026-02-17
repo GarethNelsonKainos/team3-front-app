@@ -30,18 +30,27 @@ export interface JobRoleFilters {
 	band?: string[];
 	orderBy?: string;
 	orderDir?: "asc" | "desc";
+	limit?: number;
+	offset?: number;
 }
 
-const API_BASE = process.env.API_BASE_URL || "http://localhost:3001";
-
-if (!API_BASE) {
-	throw new Error("API_BASE_URL environment variable is not set");
+export interface JobRoleListResponse {
+	roles: JobRoleResponse[];
+	totalCount?: number;
 }
+
+const getApiBase = (): string => {
+	const apiBase = process.env.API_BASE_URL || "http://localhost:3001";
+	if (!apiBase) {
+		throw new Error("API_BASE_URL environment variable is not set");
+	}
+	return apiBase;
+};
 
 export async function getOpenJobRoles(
 	filters: JobRoleFilters = {},
-): Promise<JobRoleResponse[]> {
-	const url = `${API_BASE}/api/job-roles/open`;
+): Promise<JobRoleListResponse> {
+	const url = `${getApiBase()}/api/job-roles/open`;
 	const params = new URLSearchParams();
 	if (filters.roleName) params.set("roleName", filters.roleName);
 	if (filters.location) params.set("location", filters.location);
@@ -58,14 +67,21 @@ export async function getOpenJobRoles(
 	}
 	if (filters.orderBy) params.set("orderBy", filters.orderBy);
 	if (filters.orderDir) params.set("orderDir", filters.orderDir);
+	if (filters.limit) params.set("limit", String(filters.limit));
+	if (filters.offset) params.set("offset", String(filters.offset));
 	const resp = await axios.get<JobRoleResponse[]>(url, { params });
-	return resp.data || [];
+	const totalHeader = resp.headers?.["x-total-count"];
+	const totalCount = totalHeader ? Number.parseInt(totalHeader, 10) : undefined;
+	return {
+		roles: resp.data || [],
+		totalCount: Number.isNaN(totalCount) ? undefined : totalCount,
+	};
 }
 
 export async function getJobRoleById(
 	jobRoleId: number | string,
 ): Promise<JobRoleResponse | undefined> {
-	const url = `${API_BASE}/api/job-roles/${jobRoleId}`;
+	const url = `${getApiBase()}/api/job-roles/${jobRoleId}`;
 	try {
 		const resp = await axios.get<JobRoleResponse>(url);
 		return resp.data;

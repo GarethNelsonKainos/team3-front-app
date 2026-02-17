@@ -1,5 +1,5 @@
+import "dotenv/config";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 import express, {
 	type NextFunction,
 	type Request,
@@ -10,8 +10,6 @@ import jobApplicationController from "./controllers/jobApplicationController.js"
 import jobRoleController from "./controllers/jobRoleController.js";
 import loginController from "./controllers/loginController.js";
 import registerController from "./controllers/registerController.js";
-
-dotenv.config();
 
 const app = express();
 
@@ -51,7 +49,7 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 
 export { app };
 
-const port = Number(process.env.PORT ?? 3000);
+const port = Number(process.env.PORT ?? 3001);
 const isTestEnv = process.env.NODE_ENV === "test" || process.env.VITEST;
 
 if (!isTestEnv) {

@@ -36,7 +36,7 @@ describe("getOpenJobRoles", () => {
 			`${apiBaseUrl}/api/job-roles/open`,
 			{ params: new URLSearchParams() },
 		);
-		expect(result).toEqual([]);
+		expect(result).toEqual({ roles: [], totalCount: undefined });
 	});
 });
 
