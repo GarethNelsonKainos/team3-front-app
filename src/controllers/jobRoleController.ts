@@ -74,8 +74,10 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		};
 
 		const token = req.cookies?.token as string | undefined;
-		const { roles, totalCount } =
-			await jobRoleService.getOpenJobRoles(paginatedFilters, token);
+		const { roles, totalCount } = await jobRoleService.getOpenJobRoles(
+			paginatedFilters,
+			token,
+		);
 		const fetchedRoles = Array.isArray(roles) ? roles : [];
 		const safeRoles = fetchedRoles.slice(0, pageSize);
 		const optionSourceRoles = showRoleFilteringUI

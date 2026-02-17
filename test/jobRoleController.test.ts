@@ -87,11 +87,17 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles should handle missing token cookie", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({ roles: [], totalCount: 0 });
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: [],
+			totalCount: 0,
+		});
 		const res = await request(app).get("/job-roles"); // No Cookie header
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Open job roles"); // Page still renders
-		expect(vi.mocked(jobRoleService.getOpenJobRoles)).toHaveBeenCalledWith(expect.any(Object), undefined);
+		expect(vi.mocked(jobRoleService.getOpenJobRoles)).toHaveBeenCalledWith(
+			expect.any(Object),
+			undefined,
+		);
 	});
 
 	it("GET /job-roles should show last link when total count exists", async () => {
