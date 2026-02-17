@@ -9,6 +9,7 @@ import nunjucks from "nunjucks";
 import jobApplicationController from "./controllers/jobApplicationController.js";
 import jobRoleController from "./controllers/jobRoleController.js";
 import loginController from "./controllers/loginController.js";
+import registerController from "./controllers/registerController.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(jobRoleController);
 app.use(loginController);
+app.use(registerController);
 const showJobApplicationsUI = process.env.FEATURE_JOB_APPLICATIONS === "true";
 if (showJobApplicationsUI) {
 	app.use(jobApplicationController);
@@ -49,7 +51,11 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 
 export { app };
 
-const port = Number(process.env.PORT) || 3001;
-app.listen(port, () => {
-	console.log(`Server running on http://localhost:${port}`);
-});
+const port = Number(process.env.PORT ?? 3000);
+const isTestEnv = process.env.NODE_ENV === "test" || process.env.VITEST;
+
+if (!isTestEnv) {
+	app.listen(port, () => {
+		console.log(`Server running on http://localhost:${port}`);
+	});
+}

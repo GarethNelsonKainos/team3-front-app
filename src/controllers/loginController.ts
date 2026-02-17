@@ -6,7 +6,7 @@ const router = Router();
 
 router.get("/login", (_req: Request, res: Response) => {
 	try {
-		res.render("login.html", { error: null });
+		res.render("login.html", { error: null, success: null });
 	} catch (err) {
 		console.error("Failed to load login page", err);
 		res.status(500).send("Failed to load login page");

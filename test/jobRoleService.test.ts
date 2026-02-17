@@ -1,8 +1,6 @@
 import axios from "axios";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import jobRoleService, {
-	type JobRoleResponse,
-} from "../src/services/jobRoleService";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { JobRoleResponse } from "../src/services/jobRoleService";
 
 vi.mock("axios", () => ({
 	default: {
@@ -10,23 +8,41 @@ vi.mock("axios", () => ({
 	},
 }));
 const mockedAxios = axios as unknown as { get: ReturnType<typeof vi.fn> };
+const apiBaseUrl = "http://example.test";
+
+const loadJobRoleService = async () => {
+	vi.resetModules();
+	const module = await import("../src/services/jobRoleService");
+	return module.default;
+};
+
+beforeEach(() => {
+	process.env.API_BASE_URL = apiBaseUrl;
+});
 
 afterEach(() => {
 	vi.clearAllMocks();
+	delete process.env.API_BASE_URL;
 });
 
 describe("getOpenJobRoles", () => {
 	it("returns empty array if no open roles", async () => {
+		const jobRoleService = await loadJobRoleService();
 		mockedAxios.get.mockResolvedValue({
 			data: [],
 		});
 		const result = await jobRoleService.getOpenJobRoles();
+		expect(mockedAxios.get).toHaveBeenCalledWith(
+			`${apiBaseUrl}/api/job-roles/open`,
+			{ params: new URLSearchParams() },
+		);
 		expect(result).toEqual([]);
 	});
 });
 
 describe("getJobRoleById", () => {
 	it("calls the detail endpoint and returns role data", async () => {
+		const jobRoleService = await loadJobRoleService();
 		const mockRole: JobRoleResponse = {
 			jobRoleId: 1,
 			roleName: "Software Engineer",
@@ -52,7 +68,7 @@ describe("getJobRoleById", () => {
 		mockedAxios.get.mockResolvedValue({ data: mockRole });
 		const result = await jobRoleService.getJobRoleById(123);
 		expect(mockedAxios.get).toHaveBeenCalledWith(
-			"http://localhost:3000/api/job-roles/123",
+			`${apiBaseUrl}/api/job-roles/123`,
 		);
 		expect(result).toEqual(mockRole);
 	});

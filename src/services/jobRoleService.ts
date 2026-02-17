@@ -30,7 +30,11 @@ export interface JobRoleFilters {
 	band?: string[];
 }
 
-const API_BASE = process.env.API_BASE_URL || "http://localhost:3000";
+const API_BASE = process.env.API_BASE_URL || "http://localhost:3001";
+
+if (!API_BASE) {
+	throw new Error("API_BASE_URL environment variable is not set");
+}
 
 export async function getOpenJobRoles(
 	filters: JobRoleFilters = {},

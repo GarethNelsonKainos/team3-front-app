@@ -571,6 +571,15 @@ body {
 	max-width: 420px;
 }
 
+.register-form {
+	margin-top: 20px;
+	padding: 20px;
+	border: 1px solid rgba(40, 53, 131, 0.15);
+	border-radius: 8px;
+	background: #f7f8fc;
+	max-width: 420px;
+}
+
 .login-form h2 {
 	margin: 0 0 16px;
 	color: var(--kainos-blue);
@@ -654,4 +663,22 @@ body {
 .button:focus-visible {
 	outline: 3px solid rgba(0, 159, 227, 0.45);
 	outline-offset: 2px;
+}
+
+
+.auth-card {
+	max-width: 420px;
+	margin: 0 auto;
+}
+
+.auth-button {
+	width: 100%;
+	margin-top: 12px;
+}
+
+.auth-link {
+	text-align: center;
+	margin-top: 16px;
+	color: var(--kainos-grey);
+	font-weight: 600;
 }
