@@ -32,10 +32,9 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		const band = getStringArray(req.query.band);
 
 		// Validate orderDir
-		let orderDir = getString(req.query.orderDir);
-		if (orderDir !== "asc" && orderDir !== "desc") {
-			orderDir = undefined;
-		}
+		const rawOrderDir = getString(req.query.orderDir);
+		const orderDir: "asc" | "desc" | undefined =
+			rawOrderDir === "asc" || rawOrderDir === "desc" ? rawOrderDir : undefined;
 
 		// Validate orderBy
 		const allowedOrderBy = [
@@ -45,10 +44,10 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			"band",
 			"closingDate",
 		];
-		let orderBy = getString(req.query.orderBy);
-		if (orderBy && !allowedOrderBy.includes(orderBy)) {
-			orderBy = undefined;
-		}
+		const rawOrderBy = getString(req.query.orderBy);
+		const orderBy = rawOrderBy && allowedOrderBy.includes(rawOrderBy)
+			? rawOrderBy
+			: undefined;
 
 		const filters = {
 			roleName: getString(req.query.roleName),
