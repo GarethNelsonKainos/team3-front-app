@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kainos Careers - Login</title>
+    <title>Kainos Careers - Sign Up</title>
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,8 +13,8 @@
   <section class="page-hero">
     <div class="container">
       <p class="eyebrow">Account</p>
-      <h1 class="page-hero__title">Login to Kainos Careers</h1>
-      <p class="page-hero__subtitle">Login to manage your account.</p>
+      <h1 class="page-hero__title">Sign Up to Kainos Careers</h1>
+      <p class="page-hero__subtitle">Create an account to manage your applications.</p>
     </div>
   </section>
   <div class="container page-section">
@@ -24,17 +24,12 @@
           {{ error }}
         </div>
       {% endif %}
-      {% if success %}
-        <div class="status-banner" style="background: rgba(40,167,69,0.12); border-color: rgba(40,167,69,0.4); color: #155724; margin-bottom: 16px;">
-          {{ success }}
-        </div>
-      {% endif %}
-      <form class="login-form" action="/login" method="post" aria-labelledby="login-title">
+      <form class="register-form" action="/register" method="post" aria-labelledby="register-title">
         <div class="form-field">
-          <label for="login-email">Email</label>
+          <label for="register-email">Email</label>
           <input
             type="email"
-            id="login-email"
+            id="register-email"
             name="email"
             value="{{ email }}"
             autocomplete="email"
@@ -43,19 +38,19 @@
           >
         </div>
         <div class="form-field">
-          <label for="login-password">Password</label>
+          <label for="register-password">Password</label>
           <input
             type="password"
-            id="login-password"
+            id="register-password"
             name="password"
-            autocomplete="current-password"
+            autocomplete="new-password"
             required
           >
         </div>
-        <button type="submit" class="cta-button auth-button">Log in</button>
+        <button type="submit" class="cta-button auth-button">Sign Up</button>
       </form>
       <p class="auth-link">
-        Don't have an account? <a href="/register">Sign Up</a>
+        Already have an account? <a href="/login">Log In</a>
       </p>
     </div>
   </div>

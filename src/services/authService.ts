@@ -1,6 +1,10 @@
 import axios from "axios";
 
-const API_BASE = process.env.API_BASE_URL || "http://localhost:3000";
+const API_BASE = process.env.API_BASE_URL || "http://localhost:3001";
+
+if (!API_BASE) {
+	throw new Error("API_BASE_URL environment variable is not set");
+}
 
 export async function login(email: string, password: string): Promise<string> {
 	const resp = await axios.post<{ token: string }>(`${API_BASE}/api/login`, {
@@ -10,4 +14,11 @@ export async function login(email: string, password: string): Promise<string> {
 	return resp.data.token;
 }
 
-export default { login };
+export async function register(email: string, password: string): Promise<void> {
+	await axios.post(`${API_BASE}/api/register`, {
+		email,
+		password,
+	});
+}
+
+export default { login, register };
