@@ -1,5 +1,8 @@
+import dotenv from "dotenv";
 import { type Request, type Response, Router } from "express";
 import jobRoleService from "../services/jobRoleService.js";
+
+dotenv.config();
 
 // Helper functions for query param parsing
 function getString(value: unknown): string | undefined {
@@ -27,14 +30,34 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 	try {
 		const capability = getStringArray(req.query.capability);
 		const band = getStringArray(req.query.band);
+
+		// Validate orderDir
+		let orderDir = getString(req.query.orderDir);
+		if (orderDir !== "asc" && orderDir !== "desc") {
+			orderDir = undefined;
+		}
+
+		// Validate orderBy
+		const allowedOrderBy = [
+			"roleName",
+			"location",
+			"capability",
+			"band",
+			"closingDate",
+		];
+		let orderBy = getString(req.query.orderBy);
+		if (orderBy && !allowedOrderBy.includes(orderBy)) {
+			orderBy = undefined;
+		}
+
 		const filters = {
 			roleName: getString(req.query.roleName),
 			location: getString(req.query.location),
 			closingDate: getString(req.query.closingDate),
 			capability: capability.length > 0 ? capability : undefined,
 			band: band.length > 0 ? band : undefined,
-			orderBy: getString(req.query.orderBy),
-			orderDir: getString(req.query.orderDir) as "asc" | "desc" | undefined,
+			orderBy,
+			orderDir,
 		};
 
 		let roles = await jobRoleService.getOpenJobRoles(filters);
@@ -69,7 +92,7 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		const showOrderingUI = process.env.FEATURE_ORDERING_UI === "true";
 		res.render("job-role-list.html", {
 			roles,
-			filters: filters || {},
+			filters,
 			capabilityOptions,
 			bandOptions,
 			showRoleFilteringUI,
@@ -88,6 +111,7 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			bandOptions: [],
 			baseQuery: "",
 			showOrderingUI,
+			showRoleFilteringUI,
 		});
 	}
 });

@@ -124,7 +124,7 @@
                         class="sortable-col{% if isActive %} sorted-{{ orderDir }}{% endif %}">
                         {{ col.label }}
                         {% if isActive %}
-                          <span aria-label="sorted {{ orderDir }}">
+                          <span aria-label="sorted {{ orderDir }}" class="sort-arrow{% if isActive %} active{% endif %}">
                             {% if orderDir == 'asc' %}▲{% elif orderDir == 'desc' %}▼{% endif %}
                           </span>
                         {% endif %}
