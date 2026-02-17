@@ -708,3 +708,7 @@ body {
 	color: var(--kainos-grey);
 	font-weight: 600;
 }
+
+.auth-link a {
+	color: var(--kainos-blue);
+}
