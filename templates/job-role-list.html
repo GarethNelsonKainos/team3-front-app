@@ -8,6 +8,8 @@
   </head>
   <body>
     {% include "partials/header.html" %}
+
+
     <section class="page-hero">
       <div class="container">
         <p class="eyebrow">Careers</p>
@@ -94,6 +96,45 @@
         <div class="page-card">
           <table class="job-roles-table">
             <caption>List of currently open job roles</caption>
+            {% if showOrderingUI %}
+            <thead>
+              <tr>
+                {% set columns = [
+                  { key: 'roleName', label: 'Role name' },
+                  { key: 'specification', label: 'Specification', skip: true },
+                  { key: 'location', label: 'Location' },
+                  { key: 'capability', label: 'Capability' },
+                  { key: 'band', label: 'Band' },
+                  { key: 'closingDate', label: 'Closing date' }
+                ] %}
+                {% for col in columns %}
+                  {% if col.skip %}
+                    <th scope="col">{{ col.label }}</th>
+                  {% else %}
+                    <th scope="col">
+                      {% set isActive = (orderBy == col.key) %}
+                      {% if isActive and orderDir == 'asc' %}
+                        {% set nextDir = 'desc' %}
+                      {% elseif isActive and orderDir == 'desc' %}
+                        {% set nextDir = '' %}
+                      {% else %}
+                        {% set nextDir = 'asc' %}
+                      {% endif %}
+                      <a href="?{{ baseQuery }}{% if baseQuery %}&{% endif %}orderBy={{ col.key }}{% if nextDir %}&orderDir={{ nextDir }}{% endif %}"
+                        class="sortable-col{% if isActive %} sorted-{{ orderDir }}{% endif %}">
+                        {{ col.label }}
+                        {% if isActive %}
+                          <span aria-label="sorted {{ orderDir }}" class="sort-arrow{% if isActive %} active{% endif %}">
+                            {% if orderDir == 'asc' %}▲{% elif orderDir == 'desc' %}▼{% endif %}
+                          </span>
+                        {% endif %}
+                      </a>
+                    </th>
+                  {% endif %}
+                {% endfor %}
+              </tr>
+            </thead>
+            {% else %}
             <thead>
               <tr>
                 <th scope="col">Role name</th>
@@ -104,6 +145,9 @@
                 <th scope="col">Closing date</th>
               </tr>
             </thead>
+            {% endif %}
+            {# Helper macro to merge filters and sort into query string #}
+
             <tbody>
               {% for role in roles %}
                 <tr>
