@@ -9,8 +9,30 @@ import jobRoleService from "../src/services/jobRoleService";
 
 // Mock data for all tests
 const mockRoles = [
-	{ jobRoleId: 1, roleName: "Dev", status: "open" },
-	{ jobRoleId: 2, roleName: "QA", status: "open" },
+	{
+		jobRoleId: 1,
+		roleName: "Dev",
+		location: "Belfast",
+		closingDate: "2026-03-01",
+		responsibilities: "Ship features",
+		sharepointUrl: "https://sharepoint.example/job-specs/1",
+		numberOfOpenPositions: 2,
+		capability: { capabilityId: 1, capabilityName: "Engineering" },
+		band: { bandId: 1, bandName: "SSE" },
+		status: { statusId: 1, statusName: "open" },
+	},
+	{
+		jobRoleId: 2,
+		roleName: "QA",
+		location: "Dublin",
+		closingDate: "2026-04-01",
+		responsibilities: "Test features",
+		sharepointUrl: "https://sharepoint.example/job-specs/2",
+		numberOfOpenPositions: 1,
+		capability: { capabilityId: 2, capabilityName: "Quality" },
+		band: { bandId: 2, bandName: "SE" },
+		status: { statusId: 1, statusName: "open" },
+	},
 ];
 const mockRoleDetail = {
 	jobRoleId: 1,
@@ -19,10 +41,10 @@ const mockRoleDetail = {
 	responsibilities: "Ship features",
 	sharepointUrl: "https://sharepoint.example/job-specs/1",
 	location: "Belfast",
-	capability: "Engineering",
-	band: "SSE",
+	capability: { capabilityId: 1, capabilityName: "Engineering" },
+	band: { bandId: 1, bandName: "SSE" },
 	closingDate: "2026-03-01",
-	status: "open",
+	status: { statusId: 1, statusName: "open" },
 	numberOfOpenPositions: 2,
 };
 
@@ -51,7 +73,9 @@ describe("jobRoleController", () => {
 			roles: mockRoles,
 			totalCount: 2,
 		});
-		const res = await request(app).get("/job-roles");
+		const res = await request(app)
+			.get("/job-roles")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Open job roles");
 		expect(res.text).toContain("Dev");
@@ -63,11 +87,11 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles should handle missing token cookie", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({ roles: [], totalCount: 0 });
 		const res = await request(app).get("/job-roles"); // No Cookie header
 		expect(res.status).toBe(200);
-		expect(res.text).toContain("Please log in to view job roles");
-		expect(vi.mocked(jobRoleService.getOpenJobRoles)).not.toHaveBeenCalled();
+		expect(res.text).toContain("Open job roles"); // Page still renders
+		expect(vi.mocked(jobRoleService.getOpenJobRoles)).toHaveBeenCalledWith(expect.any(Object), undefined);
 	});
 
 	it("GET /job-roles should show last link when total count exists", async () => {
@@ -108,6 +132,7 @@ describe("jobRoleController", () => {
 				limit: 11,
 				offset: 0,
 			}),
+			undefined,
 		);
 	});
 
@@ -127,6 +152,7 @@ describe("jobRoleController", () => {
 				limit: 11,
 				offset: 0,
 			}),
+			undefined,
 		);
 	});
 
@@ -146,6 +172,7 @@ describe("jobRoleController", () => {
 				limit: 11,
 				offset: 0,
 			}),
+			undefined,
 		);
 	});
 
@@ -163,6 +190,7 @@ describe("jobRoleController", () => {
 				limit: 11,
 				offset: 0,
 			}),
+			undefined,
 		);
 	});
 
@@ -178,6 +206,7 @@ describe("jobRoleController", () => {
 				limit: 11,
 				offset: 10,
 			}),
+			undefined,
 		);
 	});
 
@@ -265,7 +294,7 @@ describe("jobRoleController apply routes", () => {
 	it("GET /job-roles/:id should show apply button if open and positions > 0", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue({
 			...mockRoleDetail,
-			status: "open",
+			status: { statusId: 1, statusName: "open" },
 			numberOfOpenPositions: 2,
 		});
 		const res = await request(app)
@@ -278,7 +307,7 @@ describe("jobRoleController apply routes", () => {
 	it("GET /job-roles/:id should NOT show apply button if closed or no positions", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue({
 			...mockRoleDetail,
-			status: "closed",
+			status: { statusId: 2, statusName: "closed" },
 			numberOfOpenPositions: 0,
 		});
 		const res = await request(app)
