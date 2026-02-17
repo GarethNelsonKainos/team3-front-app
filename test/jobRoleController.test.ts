@@ -61,6 +61,14 @@ describe("jobRoleController", () => {
 		);
 	});
 
+	it("GET /job-roles should handle missing token cookie", async () => {
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		const res = await request(app).get("/job-roles"); // No Cookie header
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Please log in to view job roles");
+		expect(vi.mocked(jobRoleService.getOpenJobRoles)).not.toHaveBeenCalled();
+	});
+
 	it("GET /job-roles with valid ordering params should pass to service", async () => {
 		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
 		const res = await request(app)

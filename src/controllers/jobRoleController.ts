@@ -61,6 +61,17 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		};
 
 		const token = req.cookies?.token as string | undefined;
+
+		if (!token) {
+			if (req.accepts("html")) {
+				return res.render("login.html", {
+					error: "Please log in to view job roles",
+				});
+			} else {
+				return res.status(401).json({ error: "Missing token" });
+			}
+		}
+
 		let roles = await jobRoleService.getOpenJobRoles(filters, token);
 		if (!Array.isArray(roles)) roles = [];
 		const capabilityOptions = Array.from(
