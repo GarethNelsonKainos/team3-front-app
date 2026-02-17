@@ -1,5 +1,4 @@
 import axios from "axios";
-import dotenv from "dotenv";
 
 export interface JobRoleResponse {
 	jobRoleId: number;
@@ -30,8 +29,6 @@ export interface JobRoleFilters {
 	capability?: string[];
 	band?: string[];
 }
-
-dotenv.config();
 
 const API_BASE = process.env.API_BASE_URL || "http://localhost:3001";
 
