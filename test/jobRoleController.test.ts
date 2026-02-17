@@ -64,48 +64,48 @@ describe("jobRoleController", () => {
 	it("GET /job-roles with valid ordering params should pass to service", async () => {
 		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
 		const res = await request(app)
-		.get("/job-roles?orderBy=roleName&orderDir=asc")
-		.set("Cookie", "token=test-jwt-token");
+			.get("/job-roles?orderBy=roleName&orderDir=asc")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
-		   expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			   expect.objectContaining({ orderBy: "roleName", orderDir: "asc" }),
-			   "test-jwt-token"
-		   );
+		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
+			expect.objectContaining({ orderBy: "roleName", orderDir: "asc" }),
+			"test-jwt-token",
+		);
 	});
 
 	it("GET /job-roles with invalid orderDir should ignore param", async () => {
 		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
 		const res = await request(app)
-		.get("/job-roles?orderBy=roleName&orderDir=random")
-		.set("Cookie", "token=test-jwt-token");
+			.get("/job-roles?orderBy=roleName&orderDir=random")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
 			expect.objectContaining({ orderBy: "roleName", orderDir: undefined }),
-			"test-jwt-token"
+			"test-jwt-token",
 		);
 	});
 
 	it("GET /job-roles with invalid orderBy should ignore param", async () => {
 		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
 		const res = await request(app)
-		.get("/job-roles?orderBy=notAColumn&orderDir=asc")
-		.set("Cookie", "token=test-jwt-token");
+			.get("/job-roles?orderBy=notAColumn&orderDir=asc")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
 			expect.objectContaining({ orderBy: undefined, orderDir: "asc" }),
-			"test-jwt-token"
+			"test-jwt-token",
 		);
 	});
 
 	it("GET /job-roles with no ordering params should not set them", async () => {
 		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
 		const res = await request(app)
-		.get("/job-roles")
-		.set("Cookie", "token=test-jwt-token");
+			.get("/job-roles")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
 			expect.objectContaining({ orderBy: undefined, orderDir: undefined }),
-			"test-jwt-token"
+			"test-jwt-token",
 		);
 	});
 

@@ -58,7 +58,7 @@ export async function getOpenJobRoles(
 		}
 	}
 	const headers = token ? { Authorization: `Bearer ${token}` } : {};
-	
+
 	if (filters.orderBy) params.set("orderBy", filters.orderBy);
 	if (filters.orderDir) params.set("orderDir", filters.orderDir);
 	const resp = await axios.get<JobRoleResponse[]>(url, {
