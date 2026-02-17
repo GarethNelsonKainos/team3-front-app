@@ -1,3 +1,19 @@
+.link-button {
+	background: none;
+	border: none;
+	color: var(--kainos-grey);
+	text-decoration: none;
+	margin-left: 12px;
+	font-weight: 600;
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0;
+}
+.link-button:hover,
+.link-button:focus {
+	color: var(--kainos-blue);
+}
 .sort-arrow {
 	color: #b0b8d1;
 	font-size: 0.9em;
