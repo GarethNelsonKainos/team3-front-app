@@ -1,4 +1,5 @@
 import path from "node:path";
+import cookieParser from "cookie-parser";
 import express from "express";
 import nunjucks from "nunjucks";
 import request from "supertest";
@@ -30,6 +31,7 @@ vi.mock("../src/services/jobRoleService");
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Set up Nunjucks for template rendering in tests
 nunjucks.configure(path.join(__dirname, "../templates"), {
@@ -46,25 +48,39 @@ describe("jobRoleController", () => {
 
 	it("GET /job-roles should render job roles list", async () => {
 		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
-		const res = await request(app).get("/job-roles");
+		const res = await request(app)
+			.get("/job-roles")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Open job roles");
 		expect(res.text).toContain("Dev");
 		expect(res.text).toContain("QA");
+		expect(vi.mocked(jobRoleService.getOpenJobRoles)).toHaveBeenCalledWith(
+			expect.any(Object),
+			"test-jwt-token",
+		);
 	});
 
 	it("GET /job-roles/:id should render job role detail", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
-		const res = await request(app).get("/job-roles/1");
+		const res = await request(app)
+			.get("/job-roles/1")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Dev");
 		expect(res.text).toContain("Build things");
 		expect(res.text).toContain("Ship features");
+		expect(vi.mocked(jobRoleService.getJobRoleById)).toHaveBeenCalledWith(
+			"1",
+			"test-jwt-token",
+		);
 	});
 
 	it("GET /job-roles/:id should show not found if role missing", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(undefined);
-		const res = await request(app).get("/job-roles/999");
+		const res = await request(app)
+			.get("/job-roles/999")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Job role not found");
 	});
@@ -77,16 +93,24 @@ describe("jobRoleController apply routes", () => {
 
 	it("GET /job-roles/:id/apply should render apply form if role exists", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
-		const res = await request(app).get("/job-roles/1/apply");
+		const res = await request(app)
+			.get("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Apply for Dev");
 		expect(res.text).toContain("Upload your CV");
 		expect(res.text).toContain("Submit application");
+		expect(vi.mocked(jobRoleService.getJobRoleById)).toHaveBeenCalledWith(
+			"1",
+			"test-jwt-token",
+		);
 	});
 
 	it("GET /job-roles/:id/apply should show not found if role missing", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(undefined);
-		const res = await request(app).get("/job-roles/999/apply");
+		const res = await request(app)
+			.get("/job-roles/999/apply")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Job role not found");
 	});
@@ -95,17 +119,23 @@ describe("jobRoleController apply routes", () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
 		const res = await request(app)
 			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token")
 			.type("form")
 			.send({ cv: "fakefile.pdf" });
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Your application has been submitted");
 		expect(res.text).toContain("In progress");
+		expect(vi.mocked(jobRoleService.getJobRoleById)).toHaveBeenCalledWith(
+			"1",
+			"test-jwt-token",
+		);
 	});
 
 	it("POST /job-roles/:id/apply should show not found if role missing", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(undefined);
 		const res = await request(app)
 			.post("/job-roles/999/apply")
+			.set("Cookie", "token=test-jwt-token")
 			.type("form")
 			.send({ cv: "fakefile.pdf" });
 		expect(res.status).toBe(200);
@@ -118,7 +148,9 @@ describe("jobRoleController apply routes", () => {
 			status: "open",
 			numberOfOpenPositions: 2,
 		});
-		const res = await request(app).get("/job-roles/1");
+		const res = await request(app)
+			.get("/job-roles/1")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Apply for this role");
 	});
@@ -129,7 +161,9 @@ describe("jobRoleController apply routes", () => {
 			status: "closed",
 			numberOfOpenPositions: 0,
 		});
-		const res = await request(app).get("/job-roles/1");
+		const res = await request(app)
+			.get("/job-roles/1")
+			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).not.toContain("Apply for this role");
 	});

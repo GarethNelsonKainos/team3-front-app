@@ -35,7 +35,8 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			band: band.length > 0 ? band : undefined,
 		};
 
-		let roles = await jobRoleService.getOpenJobRoles(filters);
+		const token = req.cookies?.token as string | undefined;
+		let roles = await jobRoleService.getOpenJobRoles(filters, token);
 		if (!Array.isArray(roles)) roles = [];
 		const capabilityOptions = Array.from(
 			new Set(
@@ -79,7 +80,8 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 router.get("/job-roles/:id", async (req: Request, res: Response) => {
 	try {
 		const id = String(req.params.id);
-		const role = await jobRoleService.getJobRoleById(id);
+		const token = req.cookies?.token as string | undefined;
+		const role = await jobRoleService.getJobRoleById(id, token);
 		let canApply = false;
 		if (role && (role.numberOfOpenPositions ?? 0) > 0) {
 			canApply = true;
@@ -98,7 +100,8 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
 	try {
 		const id = String(req.params.id);
-		const role = await jobRoleService.getJobRoleById(id);
+		const token = req.cookies?.token as string | undefined;
+		const role = await jobRoleService.getJobRoleById(id, token);
 		res.render("job-role-apply.html", { role, submitted: false });
 	} catch (err) {
 		console.error("Failed to load apply form", err);
@@ -110,7 +113,8 @@ router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
 router.post("/job-roles/:id/apply", async (req: Request, res: Response) => {
 	try {
 		const id = String(req.params.id);
-		const role = await jobRoleService.getJobRoleById(id);
+		const token = req.cookies?.token as string | undefined;
+		const role = await jobRoleService.getJobRoleById(id, token);
 		res.render("job-role-apply.html", { role, submitted: !!role });
 	} catch (err) {
 		console.error("Failed to submit application", err);
