@@ -28,6 +28,8 @@ export interface JobRoleFilters {
 	closingDate?: string;
 	capability?: string[];
 	band?: string[];
+	orderBy?: string;
+	orderDir?: "asc" | "desc";
 }
 
 const API_BASE = process.env.API_BASE_URL || "http://localhost:3001";
@@ -54,6 +56,8 @@ export async function getOpenJobRoles(
 			params.append("band", value);
 		}
 	}
+	if (filters.orderBy) params.set("orderBy", filters.orderBy);
+	if (filters.orderDir) params.set("orderDir", filters.orderDir);
 	const resp = await axios.get<JobRoleResponse[]>(url, { params });
 	return resp.data || [];
 }

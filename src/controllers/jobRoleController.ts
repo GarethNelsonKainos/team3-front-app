@@ -1,5 +1,8 @@
+import dotenv from "dotenv";
 import { type Request, type Response, Router } from "express";
 import jobRoleService from "../services/jobRoleService.js";
+
+dotenv.config();
 
 // Helper functions for query param parsing
 function getString(value: unknown): string | undefined {
@@ -27,12 +30,34 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 	try {
 		const capability = getStringArray(req.query.capability);
 		const band = getStringArray(req.query.band);
+
+		// Validate orderDir
+		const rawOrderDir = getString(req.query.orderDir);
+		const orderDir: "asc" | "desc" | undefined =
+			rawOrderDir === "asc" || rawOrderDir === "desc" ? rawOrderDir : undefined;
+
+		// Validate orderBy
+		const allowedOrderBy = [
+			"roleName",
+			"location",
+			"capability",
+			"band",
+			"closingDate",
+		];
+		const rawOrderBy = getString(req.query.orderBy);
+		const orderBy =
+			rawOrderBy && allowedOrderBy.includes(rawOrderBy)
+				? rawOrderBy
+				: undefined;
+
 		const filters = {
 			roleName: getString(req.query.roleName),
 			location: getString(req.query.location),
 			closingDate: getString(req.query.closingDate),
 			capability: capability.length > 0 ? capability : undefined,
 			band: band.length > 0 ? band : undefined,
+			orderBy,
+			orderDir,
 		};
 
 		let roles = await jobRoleService.getOpenJobRoles(filters);
@@ -51,26 +76,41 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 					.filter((value): value is string => Boolean(value)),
 			),
 		).sort();
+		// Build base query string from filters (excluding sort) for sort links
+		const baseParams = new URLSearchParams();
+		if (filters.roleName) baseParams.set("roleName", filters.roleName);
+		if (filters.location) baseParams.set("location", filters.location);
+		if (filters.closingDate) baseParams.set("closingDate", filters.closingDate);
+		if (filters.capability) {
+			for (const c of filters.capability) baseParams.append("capability", c);
+		}
+		if (filters.band) {
+			for (const b of filters.band) baseParams.append("band", b);
+		}
+		const baseQuery = baseParams.toString();
+
+		const showOrderingUI = process.env.FEATURE_ORDERING_UI === "true";
 		res.render("job-role-list.html", {
 			roles,
 			filters,
 			capabilityOptions,
 			bandOptions,
 			showRoleFilteringUI,
+			orderBy: filters.orderBy,
+			orderDir: filters.orderDir,
+			baseQuery,
+			showOrderingUI,
 		});
 	} catch (err) {
 		console.error("Failed to load job roles", err);
+		const showOrderingUI = process.env.FEATURE_ORDERING_UI === "true";
 		res.render("job-role-list.html", {
 			roles: [],
-			filters: {
-				roleName: undefined,
-				location: undefined,
-				closingDate: undefined,
-				capability: undefined,
-				band: undefined,
-			},
+			filters: {},
 			capabilityOptions: [],
 			bandOptions: [],
+			baseQuery: "",
+			showOrderingUI,
 			showRoleFilteringUI,
 		});
 	}
