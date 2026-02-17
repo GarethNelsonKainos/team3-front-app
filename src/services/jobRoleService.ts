@@ -71,7 +71,8 @@ export async function getOpenJobRoles(
 	if (filters.orderBy) params.set("orderBy", filters.orderBy);
 	if (filters.orderDir) params.set("orderDir", filters.orderDir);
 	if (filters.limit !== undefined) params.set("limit", String(filters.limit));
-	if (filters.offset !== undefined) params.set("offset", String(filters.offset));
+	if (filters.offset !== undefined)
+		params.set("offset", String(filters.offset));
 	const resp = await axios.get<JobRoleResponse[]>(url, { params, headers });
 	const totalHeader = resp.headers?.["x-total-count"];
 	const totalCount = totalHeader ? Number.parseInt(totalHeader, 10) : undefined;
