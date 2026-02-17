@@ -40,6 +40,7 @@ if (!API_BASE) {
 
 export async function getOpenJobRoles(
 	filters: JobRoleFilters = {},
+	token?: string,
 ): Promise<JobRoleResponse[]> {
 	const url = `${API_BASE}/api/job-roles/open`;
 	const params = new URLSearchParams();
@@ -56,18 +57,29 @@ export async function getOpenJobRoles(
 			params.append("band", value);
 		}
 	}
+	const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
 	if (filters.orderBy) params.set("orderBy", filters.orderBy);
 	if (filters.orderDir) params.set("orderDir", filters.orderDir);
-	const resp = await axios.get<JobRoleResponse[]>(url, { params });
+	const resp = await axios.get<JobRoleResponse[]>(url, {
+		params,
+		headers,
+		withCredentials: true,
+	});
 	return resp.data || [];
 }
 
 export async function getJobRoleById(
 	jobRoleId: number | string,
+	token?: string,
 ): Promise<JobRoleResponse | undefined> {
 	const url = `${API_BASE}/api/job-roles/${jobRoleId}`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : {};
 	try {
-		const resp = await axios.get<JobRoleResponse>(url);
+		const resp = await axios.get<JobRoleResponse>(url, {
+			headers,
+			withCredentials: true,
+		});
 		return resp.data;
 	} catch (err: unknown) {
 		const axiosErr = err as { response?: { status?: number } };
