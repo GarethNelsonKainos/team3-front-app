@@ -35,6 +35,10 @@ dotenv.config();
 
 const API_BASE = process.env.API_BASE_URL;
 
+if (!API_BASE) {
+	throw new Error("API_BASE_URL environment variable is not set");
+}
+
 export async function getOpenJobRoles(
 	filters: JobRoleFilters = {},
 ): Promise<JobRoleResponse[]> {

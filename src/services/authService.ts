@@ -5,6 +5,10 @@ dotenv.config();
 
 const API_BASE = process.env.API_BASE_URL;
 
+if (!API_BASE) {
+	throw new Error("API_BASE_URL environment variable is not set");
+}
+
 export async function login(email: string, password: string): Promise<string> {
 	const resp = await axios.post<{ token: string }>(`${API_BASE}/api/login`, {
 		email,

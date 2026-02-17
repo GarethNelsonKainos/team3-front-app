@@ -1,16 +1,12 @@
 import { type Request, type Response, Router } from "express";
 import { register } from "../services/authService.js";
+import { ConflictError, ValidationError } from "../utils/errors.js";
 import { validateLogin } from "../utils/login.js";
 
 const router = Router();
 
 router.get("/register", (_req: Request, res: Response) => {
-	try {
-		res.render("register.html", { error: null });
-	} catch (err) {
-		console.error("Failed to load registration page", err);
-		res.status(500).send("Failed to load registration page");
-	}
+	res.render("register.html", { error: null });
 });
 
 router.post("/register", async (req: Request, res: Response) => {
@@ -28,7 +24,7 @@ router.post("/register", async (req: Request, res: Response) => {
 		return;
 	}
 	try {
-		await register(email as string, password as string);
+		await register(req.body.email, req.body.password);
 		res.render("login.html", {
 			success: "Registration successful. Please log in.",
 			error: null,
@@ -36,16 +32,31 @@ router.post("/register", async (req: Request, res: Response) => {
 		});
 	} catch (err) {
 		console.error("Registration error", err);
-		const apiMessage =
-			typeof err === "object" && err !== null
-				? (err as { response?: { data?: { message?: string } } }).response?.data
-						?.message
-				: undefined;
-		const message =
-			apiMessage ||
-			(err instanceof Error ? err.message : undefined) ||
-			"Registration failed. Please try again.";
-		res.status(400).render("register.html", {
+		//Default to status 500 and a default message unless specified error type is received
+		let message = "An error occurred during registration";
+		let statusCode = 500;
+
+		switch (true) {
+			case err instanceof ValidationError:
+				message = err.message;
+				statusCode = 400;
+				break;
+			case err instanceof ConflictError:
+				message = err.message;
+				statusCode = 409;
+				break;
+			case err &&
+				typeof err === "object" &&
+				"response" in err &&
+				(err as any).response?.data?.message:
+				message = (err as any).response.data.message;
+				break;
+			case err instanceof Error:
+				message = err.message;
+				break;
+		}
+
+		res.status(statusCode).render("register.html", {
 			error: message,
 			email: req.body.email,
 		});

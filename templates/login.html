@@ -18,7 +18,7 @@
     </div>
   </section>
   <div class="container page-section">
-    <div class="page-card login-card">
+    <div class="page-card auth-card">
       {% if error %}
         <div class="status-banner" style="background: rgba(220,53,69,0.12); border-color: rgba(220,53,69,0.4); color: #721c24; margin-bottom: 16px;">
           {{ error }}
@@ -52,9 +52,9 @@
             required
           >
         </div>
-        <button type="submit" class="cta-button login-button">Log in</button>
+        <button type="submit" class="cta-button auth-button">Log in</button>
       </form>
-      <p class="login-link">
+      <p class="auth-link">
         Don't have an account? <a href="/register">Sign Up</a>
       </p>
     </div>
