@@ -25,3 +25,12 @@ jobs:
 
     - name: Run tests
       run: npm run test
+
+    - name: Start dev server
+      run: npm run dev &
+
+    - name: Wait for server to be ready
+      run: npx wait-on http://localhost:3000
+
+    - name: Run accessibility tests
+      run: npm run accessibility
