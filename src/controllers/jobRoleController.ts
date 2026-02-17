@@ -45,9 +45,10 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			"closingDate",
 		];
 		const rawOrderBy = getString(req.query.orderBy);
-		const orderBy = rawOrderBy && allowedOrderBy.includes(rawOrderBy)
-			? rawOrderBy
-			: undefined;
+		const orderBy =
+			rawOrderBy && allowedOrderBy.includes(rawOrderBy)
+				? rawOrderBy
+				: undefined;
 
 		const filters = {
 			roleName: getString(req.query.roleName),
