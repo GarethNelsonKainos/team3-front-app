@@ -1,5 +1,5 @@
+import "dotenv/config";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 import express, {
 	type NextFunction,
 	type Request,
@@ -10,8 +10,6 @@ import jobApplicationController from "./controllers/jobApplicationController.js"
 import jobRoleController from "./controllers/jobRoleController.js";
 import loginController from "./controllers/loginController.js";
 import registerController from "./controllers/registerController.js";
-
-dotenv.config();
 
 const app = express();
 

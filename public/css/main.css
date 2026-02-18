@@ -1,18 +1,20 @@
-.link-button {
-	background: none;
-	border: none;
-	color: var(--kainos-grey);
-	text-decoration: none;
-	margin-left: 12px;
-	font-weight: 600;
-	font: inherit;
-	font-weight: 600;
-	cursor: pointer;
-	padding: 0;
+/* Filter and Pagination Card Styles */
+.filter-card {
+	margin-bottom: 20px;
 }
-.link-button:hover,
-.link-button:focus {
-	color: var(--kainos-blue);
+.filter-actions {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+.pagination-card {
+	margin-top: 16px;
+}
+.pagination-bar {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+	align-items: center;
 }
 .sort-arrow {
 	color: #b0b8d1;

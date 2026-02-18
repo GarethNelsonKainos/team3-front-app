@@ -38,10 +38,9 @@ describe("getOpenJobRoles", () => {
 			{
 				params: new URLSearchParams(),
 				headers: { Authorization: `Bearer ${token}` },
-				withCredentials: true,
 			},
 		);
-		expect(result).toEqual([]);
+		expect(result).toEqual({ roles: [], totalCount: undefined });
 	});
 
 	it("returns empty array if no token provided", async () => {
@@ -54,11 +53,10 @@ describe("getOpenJobRoles", () => {
 			`${apiBaseUrl}/api/job-roles/open`,
 			{
 				params: new URLSearchParams(),
-				headers: {},
-				withCredentials: true,
+				headers: undefined,
 			},
 		);
-		expect(result).toEqual([]);
+		expect(result).toEqual({ roles: [], totalCount: undefined });
 	});
 });
 
@@ -129,7 +127,7 @@ describe("getJobRoleById", () => {
 		expect(mockedAxios.get).toHaveBeenCalledWith(
 			`${apiBaseUrl}/api/job-roles/123`,
 			{
-				headers: {},
+				headers: undefined,
 				withCredentials: true,
 			},
 		);
