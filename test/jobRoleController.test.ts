@@ -66,6 +66,9 @@ app.use("/", jobRoleController);
 describe("jobRoleController", () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
+		vi.mocked(jobRoleService.getJobRoleApplications).mockResolvedValue([]);
+		vi.mocked(jobRoleService.hireApplication).mockResolvedValue();
+		vi.mocked(jobRoleService.rejectApplication).mockResolvedValue();
 	});
 
 	it("GET /job-roles should render job roles list", async () => {
@@ -218,6 +221,7 @@ describe("jobRoleController", () => {
 
 	it("GET /job-roles/:id should render job role detail", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(jobRoleService.getJobRoleApplications).mockResolvedValue([]);
 		const res = await request(app)
 			.get("/job-roles/1")
 			.set("Cookie", "token=test-jwt-token");
@@ -227,6 +231,75 @@ describe("jobRoleController", () => {
 		expect(res.text).toContain("Ship features");
 		expect(vi.mocked(jobRoleService.getJobRoleById)).toHaveBeenCalledWith(
 			"1",
+			"test-jwt-token",
+		);
+		expect(
+			vi.mocked(jobRoleService.getJobRoleApplications),
+		).toHaveBeenCalledWith("1", "test-jwt-token");
+	});
+
+	it("GET /job-roles/:id should render applications list for admins", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(jobRoleService.getJobRoleApplications).mockResolvedValue([
+			{
+				applicationId: 101,
+				applicationStatus: "InProgress",
+				email: "candidate@example.com",
+				cvUrl: "https://example-bucket.s3.amazonaws.com/cv.pdf",
+			},
+		]);
+
+		const res = await request(app)
+			.get("/job-roles/1")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Applications for this role");
+		expect(res.text).toContain("candidate@example.com");
+		expect(res.text).toContain("Hire");
+		expect(res.text).toContain("Reject");
+	});
+
+	it("GET /job-roles/:id should hide applications list for non-admin users", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(jobRoleService.getJobRoleApplications).mockRejectedValue({
+			response: { status: 403 },
+		});
+
+		const res = await request(app)
+			.get("/job-roles/1")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(200);
+		expect(res.text).not.toContain("Applications for this role");
+	});
+
+	it("POST /job-roles/:id/applications/:applicationId/hire should update and redirect", async () => {
+		vi.mocked(jobRoleService.hireApplication).mockResolvedValue();
+
+		const res = await request(app)
+			.post("/job-roles/1/applications/101/hire")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(302);
+		expect(res.headers.location).toContain("/job-roles/1?success=");
+		expect(vi.mocked(jobRoleService.hireApplication)).toHaveBeenCalledWith(
+			"101",
+			"test-jwt-token",
+		);
+	});
+
+	it("POST /job-roles/:id/applications/:applicationId/reject should update and redirect", async () => {
+		vi.mocked(jobRoleService.rejectApplication).mockResolvedValue();
+
+		const res = await request(app)
+			.post("/job-roles/1/applications/101/reject")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(302);
+		expect(res.headers.location).toContain("/job-roles/1?success=");
+		expect(vi.mocked(jobRoleService.rejectApplication)).toHaveBeenCalledWith(
+			"101",
 			"test-jwt-token",
 		);
 	});

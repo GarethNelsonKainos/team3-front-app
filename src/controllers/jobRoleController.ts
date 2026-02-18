@@ -22,6 +22,16 @@ function getStringArray(value: unknown): string[] {
 const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === "true";
 const DEFAULT_PAGE_SIZE = 10;
 
+const getAxiosStatus = (err: unknown): number | undefined => {
+	const axiosErr = err as { response?: { status?: number } };
+	return axiosErr.response?.status;
+};
+
+const getAxiosMessage = (err: unknown): string | undefined => {
+	const axiosErr = err as { response?: { data?: { message?: string } } };
+	return axiosErr.response?.data?.message;
+};
+
 const router = Router();
 
 router.get("/job-roles", async (req: Request, res: Response) => {
@@ -190,19 +200,132 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 		const id = String(req.params.id);
 		const token = req.cookies?.token as string | undefined;
 		const role = await jobRoleService.getJobRoleById(id, token);
+		const successMessage = getString(req.query.success);
+		const errorMessage = getString(req.query.error);
+
+		const applicationsPanel = {
+			visible: false,
+			items: [] as Array<{
+				applicationId: number;
+				applicationStatus: string;
+				applicantName: string;
+				cvUrl?: string;
+				canAssess: boolean;
+			}>,
+			success: successMessage,
+			error: errorMessage,
+		};
+
+		if (role && token) {
+			try {
+				const applications = await jobRoleService.getJobRoleApplications(
+					id,
+					token,
+				);
+				applicationsPanel.visible = true;
+				applicationsPanel.items = applications.map((application) => {
+					const applicantName =
+						application.email ||
+						application.username ||
+						application.user?.email ||
+						application.user?.username ||
+						"Unknown applicant";
+					const statusLabel = application.applicationStatus || "Unknown";
+					return {
+						applicationId: application.applicationId,
+						applicationStatus: statusLabel,
+						applicantName,
+						cvUrl: application.cvUrl,
+						canAssess:
+							statusLabel.toLowerCase() === "inprogress" ||
+							statusLabel.toLowerCase() === "in progress",
+					};
+				});
+			} catch (err) {
+				const status = getAxiosStatus(err);
+				if (status !== 401 && status !== 403) {
+					applicationsPanel.visible = true;
+					applicationsPanel.error =
+						getAxiosMessage(err) || "Failed to load applications.";
+				}
+			}
+		}
+
 		let canApply = false;
 		if (role && (role.numberOfOpenPositions ?? 0) > 0) {
 			canApply = true;
 		}
-		res.render("job-role-information.html", { role, canApply });
+		res.render("job-role-information.html", {
+			role,
+			canApply,
+			applicationsPanel,
+		});
 	} catch (err) {
 		console.error("Failed to load job role", err);
 		res.render("job-role-information.html", {
 			role: undefined,
 			canApply: false,
+			applicationsPanel: {
+				visible: false,
+				items: [],
+				success: undefined,
+				error: undefined,
+			},
 		});
 	}
 });
+
+router.post(
+	"/job-roles/:id/applications/:applicationId/hire",
+	async (req: Request, res: Response) => {
+		const roleId = String(req.params.id);
+		const applicationId = String(req.params.applicationId);
+		const token = req.cookies?.token as string | undefined;
+		if (!token) {
+			res.redirect("/login");
+			return;
+		}
+
+		try {
+			await jobRoleService.hireApplication(applicationId, token);
+			const success = encodeURIComponent("Application marked as Hired.");
+			res.redirect(`/job-roles/${roleId}?success=${success}`);
+			return;
+		} catch (err) {
+			const error = encodeURIComponent(
+				getAxiosMessage(err) || "Could not hire applicant.",
+			);
+			res.redirect(`/job-roles/${roleId}?error=${error}`);
+			return;
+		}
+	},
+);
+
+router.post(
+	"/job-roles/:id/applications/:applicationId/reject",
+	async (req: Request, res: Response) => {
+		const roleId = String(req.params.id);
+		const applicationId = String(req.params.applicationId);
+		const token = req.cookies?.token as string | undefined;
+		if (!token) {
+			res.redirect("/login");
+			return;
+		}
+
+		try {
+			await jobRoleService.rejectApplication(applicationId, token);
+			const success = encodeURIComponent("Application marked as Rejected.");
+			res.redirect(`/job-roles/${roleId}?success=${success}`);
+			return;
+		} catch (err) {
+			const error = encodeURIComponent(
+				getAxiosMessage(err) || "Could not reject applicant.",
+			);
+			res.redirect(`/job-roles/${roleId}?error=${error}`);
+			return;
+		}
+	},
+);
 
 // GET apply form
 router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {

@@ -39,6 +39,18 @@ export interface JobRoleListResponse {
 	totalCount?: number;
 }
 
+export interface JobRoleApplicationResponse {
+	applicationId: number;
+	applicationStatus: string;
+	cvUrl?: string;
+	email?: string;
+	username?: string;
+	user?: {
+		email?: string;
+		username?: string;
+	};
+}
+
 const getApiBase = (): string => {
 	const apiBase = process.env.API_BASE_URL || "http://localhost:3001";
 	if (!apiBase) {
@@ -103,4 +115,38 @@ export async function getJobRoleById(
 	}
 }
 
-export default { getOpenJobRoles, getJobRoleById };
+export async function getJobRoleApplications(
+	jobRoleId: number | string,
+	token?: string,
+): Promise<JobRoleApplicationResponse[]> {
+	const url = `${getApiBase()}/api/job-roles/${jobRoleId}/applications`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+	const resp = await axios.get<JobRoleApplicationResponse[]>(url, { headers });
+	return resp.data || [];
+}
+
+export async function hireApplication(
+	applicationId: number | string,
+	token?: string,
+): Promise<void> {
+	const url = `${getApiBase()}/api/applications/${applicationId}/hire`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+	await axios.put(url, undefined, { headers });
+}
+
+export async function rejectApplication(
+	applicationId: number | string,
+	token?: string,
+): Promise<void> {
+	const url = `${getApiBase()}/api/applications/${applicationId}/reject`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+	await axios.put(url, undefined, { headers });
+}
+
+export default {
+	getOpenJobRoles,
+	getJobRoleById,
+	getJobRoleApplications,
+	hireApplication,
+	rejectApplication,
+};
