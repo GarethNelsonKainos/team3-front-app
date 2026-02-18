@@ -1,8 +1,8 @@
-import axios from "axios";
 import dotenv from "dotenv";
 import { type Request, type Response, Router } from "express";
 import FormData from "form-data";
 import jobRoleService from "../services/jobRoleService.js";
+import { uploadCV } from "../services/uploadService.js";
 import upload from "../utils/upload.js";
 
 dotenv.config();
@@ -207,15 +207,7 @@ router.post(
 				contentType: req.file.mimetype,
 			});
 
-			const backendUrl = process.env.API_URL || "http://localhost:3001";
-			const apiUrl = `${backendUrl}/job-roles/${id}/apply`;
-
-			await axios.post(apiUrl, formData, {
-				headers: {
-					...formData.getHeaders(),
-					...(token ? { Authorization: `Bearer ${token}` } : {}),
-				},
-			});
+			await uploadCV(id, formData, token);
 
 			res.render("job-role-apply.html", { role, submitted: true });
 		} catch (err) {
