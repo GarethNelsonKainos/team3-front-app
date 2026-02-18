@@ -122,36 +122,38 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 			totalCount !== undefined
 				? Math.max(1, Math.ceil(totalCount / pageSize))
 				: undefined;
-		const hasPrev = currentPage > 1;
-		const hasNext =
-			totalPages !== undefined
+		const pagination = {
+			currentPage,
+			prevPage: currentPage > 1 ? currentPage - 1 : 1,
+			nextPage: (totalPages !== undefined
 				? currentPage < totalPages
-				: fetchedRoles.length > pageSize;
-		const prevPage = hasPrev ? currentPage - 1 : 1;
-		const nextPage = hasNext ? currentPage + 1 : currentPage;
-		const lastPage = totalPages ?? currentPage;
-		const showLast = totalPages !== undefined;
-
+				: fetchedRoles.length > pageSize)
+				? currentPage + 1
+				: currentPage,
+			lastPage: totalPages ?? currentPage,
+			totalPages,
+			hasPrev: currentPage > 1,
+			hasNext: totalPages !== undefined
+				? currentPage < totalPages
+				: fetchedRoles.length > pageSize,
+			showLast: totalPages !== undefined,
+			filterQuery,
+			paginationQuery,
+		};
+		const options = {
+			capability: capabilityOptions,
+			band: bandOptions,
+		};
 		const showOrderingUI = process.env.FEATURE_ORDERING_UI === "true";
 		res.render("job-role-list.html", {
 			roles: safeRoles,
 			filters: baseFilters,
-			capabilityOptions,
-			bandOptions,
+			options,
 			showRoleFilteringUI,
 			orderBy,
 			orderDir,
-			filterQuery,
-			paginationQuery,
+			pagination,
 			showOrderingUI,
-			currentPage,
-			prevPage,
-			nextPage,
-			lastPage,
-			totalPages,
-			hasPrev,
-			hasNext,
-			showLast,
 		});
 	} catch (err) {
 		console.error("Failed to load job roles", err);
@@ -159,19 +161,23 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		res.render("job-role-list.html", {
 			roles: [],
 			filters: {},
-			capabilityOptions: [],
-			bandOptions: [],
-			baseQuery: "",
+			options: { capability: [], band: [] },
 			showOrderingUI,
 			showRoleFilteringUI,
-			currentPage: 1,
-			prevPage: 1,
-			nextPage: 1,
-			lastPage: 1,
-			totalPages: 1,
-			hasPrev: false,
-			hasNext: false,
-			showLast: false,
+			orderBy: undefined,
+			orderDir: undefined,
+			pagination: {
+				currentPage: 1,
+				prevPage: 1,
+				nextPage: 1,
+				lastPage: 1,
+				totalPages: 1,
+				hasPrev: false,
+				hasNext: false,
+				showLast: false,
+				filterQuery: "",
+				paginationQuery: "",
+			},
 		});
 	}
 });
