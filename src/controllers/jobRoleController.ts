@@ -125,17 +125,20 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		const pagination = {
 			currentPage,
 			prevPage: currentPage > 1 ? currentPage - 1 : 1,
-			nextPage: (totalPages !== undefined
-				? currentPage < totalPages
-				: fetchedRoles.length > pageSize)
+			nextPage: (
+				totalPages !== undefined
+					? currentPage < totalPages
+					: fetchedRoles.length > pageSize
+			)
 				? currentPage + 1
 				: currentPage,
 			lastPage: totalPages ?? currentPage,
 			totalPages,
 			hasPrev: currentPage > 1,
-			hasNext: totalPages !== undefined
-				? currentPage < totalPages
-				: fetchedRoles.length > pageSize,
+			hasNext:
+				totalPages !== undefined
+					? currentPage < totalPages
+					: fetchedRoles.length > pageSize,
 			showLast: totalPages !== undefined,
 			filterQuery,
 			paginationQuery,

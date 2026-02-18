@@ -177,24 +177,24 @@
         <div class="page-card pagination-card">
           <div class="pagination-bar">
             <span class="text-link">
-              Page {{ currentPage }}{% if totalPages %} of {{ totalPages }}{% endif %}
+              Page {{ pagination.currentPage }}{% if pagination.totalPages %} of {{ pagination.totalPages }}{% endif %}
             </span>
-            {% if hasPrev %}
-              <a class="text-link" href="?{{ paginationQuery }}{% if paginationQuery %}&{% endif %}page=1">First</a>
-              <a class="text-link" href="?{{ paginationQuery }}{% if paginationQuery %}&{% endif %}page={{ prevPage }}">Previous</a>
+            {% if pagination.hasPrev %}
+              <a class="text-link" href="?{{ pagination.paginationQuery }}{% if pagination.paginationQuery %}&{% endif %}page=1">First</a>
+              <a class="text-link" href="?{{ pagination.paginationQuery }}{% if pagination.paginationQuery %}&{% endif %}page={{ pagination.prevPage }}">Previous</a>
             {% else %}
               <span class="text-link" aria-disabled="true">First</span>
               <span class="text-link" aria-disabled="true">Previous</span>
             {% endif %}
 
-            {% if hasNext %}
-              <a class="text-link" href="?{{ paginationQuery }}{% if paginationQuery %}&{% endif %}page={{ nextPage }}">Next</a>
+            {% if pagination.hasNext %}
+              <a class="text-link" href="?{{ pagination.paginationQuery }}{% if pagination.paginationQuery %}&{% endif %}page={{ pagination.nextPage }}">Next</a>
             {% else %}
               <span class="text-link" aria-disabled="true">Next</span>
             {% endif %}
 
-            {% if showLast %}
-              <a class="text-link" href="?{{ paginationQuery }}{% if paginationQuery %}&{% endif %}page={{ lastPage }}">Last</a>
+            {% if pagination.showLast %}
+              <a class="text-link" href="?{{ pagination.paginationQuery }}{% if pagination.paginationQuery %}&{% endif %}page={{ pagination.lastPage }}">Last</a>
             {% endif %}
           </div>
         </div>
