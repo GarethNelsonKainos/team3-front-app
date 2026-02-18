@@ -49,7 +49,7 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 
 export { app };
 
-const port = Number(process.env.PORT ?? 3001);
+const port = Number(process.env.PORT ?? 3000);
 const isTestEnv = process.env.NODE_ENV === "test" || process.env.VITEST;
 
 if (!isTestEnv) {
