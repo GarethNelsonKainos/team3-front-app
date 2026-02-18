@@ -48,8 +48,11 @@ router.post("/register", async (req: Request, res: Response) => {
 			case err &&
 				typeof err === "object" &&
 				"response" in err &&
-				(err as any).response?.data?.message:
-				message = (err as any).response.data.message;
+				(err as { response?: { data?: { message?: string } } }).response?.data
+					?.message:
+				message =
+					(err as { response?: { data?: { message?: string } } }).response?.data
+						?.message ?? "An error occurred during registration";
 				break;
 			case err instanceof Error:
 				message = err.message;

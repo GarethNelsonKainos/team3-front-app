@@ -9,8 +9,30 @@ import jobRoleService from "../src/services/jobRoleService";
 
 // Mock data for all tests
 const mockRoles = [
-	{ jobRoleId: 1, roleName: "Dev", status: "open" },
-	{ jobRoleId: 2, roleName: "QA", status: "open" },
+	{
+		jobRoleId: 1,
+		roleName: "Dev",
+		location: "Belfast",
+		closingDate: "2026-03-01",
+		responsibilities: "Ship features",
+		sharepointUrl: "https://sharepoint.example/job-specs/1",
+		numberOfOpenPositions: 2,
+		capability: { capabilityId: 1, capabilityName: "Engineering" },
+		band: { bandId: 1, bandName: "SSE" },
+		status: { statusId: 1, statusName: "open" },
+	},
+	{
+		jobRoleId: 2,
+		roleName: "QA",
+		location: "Dublin",
+		closingDate: "2026-04-01",
+		responsibilities: "Test features",
+		sharepointUrl: "https://sharepoint.example/job-specs/2",
+		numberOfOpenPositions: 1,
+		capability: { capabilityId: 2, capabilityName: "Quality" },
+		band: { bandId: 2, bandName: "SE" },
+		status: { statusId: 1, statusName: "open" },
+	},
 ];
 const mockRoleDetail = {
 	jobRoleId: 1,
@@ -19,10 +41,10 @@ const mockRoleDetail = {
 	responsibilities: "Ship features",
 	sharepointUrl: "https://sharepoint.example/job-specs/1",
 	location: "Belfast",
-	capability: "Engineering",
-	band: "SSE",
+	capability: { capabilityId: 1, capabilityName: "Engineering" },
+	band: { bandId: 1, bandName: "SSE" },
 	closingDate: "2026-03-01",
-	status: "open",
+	status: { statusId: 1, statusName: "open" },
 	numberOfOpenPositions: 2,
 };
 
@@ -47,7 +69,10 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles should render job roles list", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
 		const res = await request(app)
 			.get("/job-roles")
 			.set("Cookie", "token=test-jwt-token");
@@ -62,58 +87,132 @@ describe("jobRoleController", () => {
 	});
 
 	it("GET /job-roles should handle missing token cookie", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: [],
+			totalCount: 0,
+		});
 		const res = await request(app).get("/job-roles"); // No Cookie header
 		expect(res.status).toBe(200);
-		expect(res.text).toContain("Please log in to view job roles");
-		expect(vi.mocked(jobRoleService.getOpenJobRoles)).not.toHaveBeenCalled();
+		expect(res.text).toContain("Open job roles"); // Page still renders
+		expect(vi.mocked(jobRoleService.getOpenJobRoles)).toHaveBeenCalledWith(
+			expect.any(Object),
+			undefined,
+		);
+	});
+
+	it("GET /job-roles should show last link when total count exists", async () => {
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 25,
+		});
+		const res = await request(app).get("/job-roles");
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Page 1 of 3");
+		expect(res.text).toContain(">Last<");
+	});
+
+	it("GET /job-roles should hide last link when total count is missing", async () => {
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: undefined,
+		});
+		const res = await request(app).get("/job-roles");
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Page 1");
+		expect(res.text).not.toContain(">Last<");
 	});
 
 	it("GET /job-roles with valid ordering params should pass to service", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
-		const res = await request(app)
-			.get("/job-roles?orderBy=roleName&orderDir=asc")
-			.set("Cookie", "token=test-jwt-token");
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
+		const res = await request(app).get(
+			"/job-roles?orderBy=roleName&orderDir=asc",
+		);
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: "roleName", orderDir: "asc" }),
-			"test-jwt-token",
+			expect.objectContaining({
+				orderBy: "roleName",
+				orderDir: "asc",
+				limit: 11,
+				offset: 0,
+			}),
+			undefined,
 		);
 	});
 
 	it("GET /job-roles with invalid orderDir should ignore param", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
-		const res = await request(app)
-			.get("/job-roles?orderBy=roleName&orderDir=random")
-			.set("Cookie", "token=test-jwt-token");
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
+		const res = await request(app).get(
+			"/job-roles?orderBy=roleName&orderDir=random",
+		);
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: "roleName", orderDir: undefined }),
-			"test-jwt-token",
+			expect.objectContaining({
+				orderBy: "roleName",
+				orderDir: undefined,
+				limit: 11,
+				offset: 0,
+			}),
+			undefined,
 		);
 	});
 
 	it("GET /job-roles with invalid orderBy should ignore param", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
-		const res = await request(app)
-			.get("/job-roles?orderBy=notAColumn&orderDir=asc")
-			.set("Cookie", "token=test-jwt-token");
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
+		const res = await request(app).get(
+			"/job-roles?orderBy=notAColumn&orderDir=asc",
+		);
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: undefined, orderDir: "asc" }),
-			"test-jwt-token",
+			expect.objectContaining({
+				orderBy: undefined,
+				orderDir: "asc",
+				limit: 11,
+				offset: 0,
+			}),
+			undefined,
 		);
 	});
 
 	it("GET /job-roles with no ordering params should not set them", async () => {
-		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue(mockRoles);
-		const res = await request(app)
-			.get("/job-roles")
-			.set("Cookie", "token=test-jwt-token");
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
+		const res = await request(app).get("/job-roles");
 		expect(res.status).toBe(200);
 		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
-			expect.objectContaining({ orderBy: undefined, orderDir: undefined }),
-			"test-jwt-token",
+			expect.objectContaining({
+				orderBy: undefined,
+				orderDir: undefined,
+				limit: 11,
+				offset: 0,
+			}),
+			undefined,
+		);
+	});
+
+	it("GET /job-roles page=2 should set offset to 10", async () => {
+		vi.mocked(jobRoleService.getOpenJobRoles).mockResolvedValue({
+			roles: mockRoles,
+			totalCount: 2,
+		});
+		const res = await request(app).get("/job-roles?page=2");
+		expect(res.status).toBe(200);
+		expect(jobRoleService.getOpenJobRoles).toHaveBeenCalledWith(
+			expect.objectContaining({
+				limit: 11,
+				offset: 10,
+			}),
+			undefined,
 		);
 	});
 
@@ -201,7 +300,7 @@ describe("jobRoleController apply routes", () => {
 	it("GET /job-roles/:id should show apply button if open and positions > 0", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue({
 			...mockRoleDetail,
-			status: "open",
+			status: { statusId: 1, statusName: "open" },
 			numberOfOpenPositions: 2,
 		});
 		const res = await request(app)
@@ -214,7 +313,7 @@ describe("jobRoleController apply routes", () => {
 	it("GET /job-roles/:id should NOT show apply button if closed or no positions", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue({
 			...mockRoleDetail,
-			status: "closed",
+			status: { statusId: 2, statusName: "closed" },
 			numberOfOpenPositions: 0,
 		});
 		const res = await request(app)

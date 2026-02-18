@@ -1,8 +1,5 @@
-import dotenv from "dotenv";
 import { type Request, type Response, Router } from "express";
 import jobRoleService from "../services/jobRoleService.js";
-
-dotenv.config();
 
 // Helper functions for query param parsing
 function getString(value: unknown): string | undefined {
@@ -23,6 +20,7 @@ function getStringArray(value: unknown): string[] {
 }
 
 const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === "true";
+const DEFAULT_PAGE_SIZE = 10;
 
 const router = Router();
 
@@ -30,6 +28,13 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 	try {
 		const capability = getStringArray(req.query.capability);
 		const band = getStringArray(req.query.band);
+		const rawPage = getString(req.query.page);
+		const parsedPage = rawPage ? Number.parseInt(rawPage, 10) : 1;
+		const currentPage =
+			Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+		const pageSize = DEFAULT_PAGE_SIZE;
+		const fetchLimit = pageSize + 1;
+		const offset = (currentPage - 1) * pageSize;
 
 		// Validate orderDir
 		const rawOrderDir = getString(req.query.orderDir);
@@ -50,67 +55,107 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 				? rawOrderBy
 				: undefined;
 
-		const filters = {
+		const baseFilters = {
 			roleName: getString(req.query.roleName),
 			location: getString(req.query.location),
 			closingDate: getString(req.query.closingDate),
 			capability: capability.length > 0 ? capability : undefined,
 			band: band.length > 0 ? band : undefined,
+		};
+		const paginatedFilters = {
+			...baseFilters,
 			orderBy,
 			orderDir,
+			limit: fetchLimit,
+			offset,
+		};
+		const optionFilters = {
+			...baseFilters,
 		};
 
 		const token = req.cookies?.token as string | undefined;
-
-		if (!token) {
-			if (req.accepts("html")) {
-				return res.render("login.html", {
-					error: "Please log in to view job roles",
-				});
-			} else {
-				return res.status(401).json({ error: "Missing token" });
-			}
-		}
-
-		let roles = await jobRoleService.getOpenJobRoles(filters, token);
-		if (!Array.isArray(roles)) roles = [];
+		const { roles, totalCount } = await jobRoleService.getOpenJobRoles(
+			paginatedFilters,
+			token,
+		);
+		const fetchedRoles = Array.isArray(roles) ? roles : [];
+		const safeRoles = fetchedRoles.slice(0, pageSize);
+		const optionSourceRoles = showRoleFilteringUI
+			? (await jobRoleService.getOpenJobRoles(optionFilters, token)).roles
+			: safeRoles;
 		const capabilityOptions = Array.from(
 			new Set(
-				roles
+				optionSourceRoles
 					.map((role) => role.capability?.capabilityName)
 					.filter((value): value is string => Boolean(value)),
 			),
 		).sort();
 		const bandOptions = Array.from(
 			new Set(
-				roles
+				optionSourceRoles
 					.map((role) => role.band?.bandName)
 					.filter((value): value is string => Boolean(value)),
 			),
 		).sort();
 		// Build base query string from filters (excluding sort) for sort links
-		const baseParams = new URLSearchParams();
-		if (filters.roleName) baseParams.set("roleName", filters.roleName);
-		if (filters.location) baseParams.set("location", filters.location);
-		if (filters.closingDate) baseParams.set("closingDate", filters.closingDate);
-		if (filters.capability) {
-			for (const c of filters.capability) baseParams.append("capability", c);
+		const filterParams = new URLSearchParams();
+		if (baseFilters.roleName)
+			filterParams.set("roleName", baseFilters.roleName);
+		if (baseFilters.location)
+			filterParams.set("location", baseFilters.location);
+		if (baseFilters.closingDate)
+			filterParams.set("closingDate", baseFilters.closingDate);
+		if (baseFilters.capability) {
+			for (const c of baseFilters.capability)
+				filterParams.append("capability", c);
 		}
-		if (filters.band) {
-			for (const b of filters.band) baseParams.append("band", b);
+		if (baseFilters.band) {
+			for (const b of baseFilters.band) filterParams.append("band", b);
 		}
-		const baseQuery = baseParams.toString();
+		const filterQuery = filterParams.toString();
+		const paginationParams = new URLSearchParams(filterQuery);
+		if (orderBy) paginationParams.set("orderBy", orderBy);
+		if (orderDir) paginationParams.set("orderDir", orderDir);
+		const paginationQuery = paginationParams.toString();
 
+		const totalPages =
+			totalCount !== undefined
+				? Math.max(1, Math.ceil(totalCount / pageSize))
+				: undefined;
+		const pagination = {
+			currentPage,
+			prevPage: currentPage > 1 ? currentPage - 1 : 1,
+			nextPage: (
+				totalPages !== undefined
+					? currentPage < totalPages
+					: fetchedRoles.length > pageSize
+			)
+				? currentPage + 1
+				: currentPage,
+			lastPage: totalPages ?? currentPage,
+			totalPages,
+			hasPrev: currentPage > 1,
+			hasNext:
+				totalPages !== undefined
+					? currentPage < totalPages
+					: fetchedRoles.length > pageSize,
+			showLast: totalPages !== undefined,
+			filterQuery,
+			paginationQuery,
+		};
+		const options = {
+			capability: capabilityOptions,
+			band: bandOptions,
+		};
 		const showOrderingUI = process.env.FEATURE_ORDERING_UI === "true";
 		res.render("job-role-list.html", {
-			roles,
-			filters,
-			capabilityOptions,
-			bandOptions,
+			roles: safeRoles,
+			filters: baseFilters,
+			options,
 			showRoleFilteringUI,
-			orderBy: filters.orderBy,
-			orderDir: filters.orderDir,
-			baseQuery,
+			orderBy,
+			orderDir,
+			pagination,
 			showOrderingUI,
 		});
 	} catch (err) {
@@ -119,11 +164,23 @@ router.get("/job-roles", async (req: Request, res: Response) => {
 		res.render("job-role-list.html", {
 			roles: [],
 			filters: {},
-			capabilityOptions: [],
-			bandOptions: [],
-			baseQuery: "",
+			options: { capability: [], band: [] },
 			showOrderingUI,
 			showRoleFilteringUI,
+			orderBy: undefined,
+			orderDir: undefined,
+			pagination: {
+				currentPage: 1,
+				prevPage: 1,
+				nextPage: 1,
+				lastPage: 1,
+				totalPages: 1,
+				hasPrev: false,
+				hasNext: false,
+				showLast: false,
+				filterQuery: "",
+				paginationQuery: "",
+			},
 		});
 	}
 });
