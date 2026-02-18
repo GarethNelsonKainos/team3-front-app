@@ -1,4 +1,5 @@
 import pa11y from "pa11y";
+import puppeteer from "puppeteer";
 
 const urls = [
 	"http://localhost:3000/", // Home page
@@ -11,23 +12,40 @@ const urls = [
 ];
 
 async function runAccessibilityTests() {
-	for (const url of urls) {
-		const results = await pa11y(url);
-		console.log(`Accessibility results for ${url}:`);
-		if (results.issues.length === 0) {
-			console.log("- No accessibility issues found.");
-		} else {
-			results.issues.forEach((issue, idx) => {
-				console.log(`Issue #${idx + 1}:`);
-				console.log(`  Type:      ${issue.type} (code: ${issue.typeCode})`);
-				console.log(`  Message:   ${issue.message}`);
-				console.log(`  Rule:      ${issue.code}`);
-				console.log(`  Selector:  ${issue.selector}`);
-				console.log(`  Context:   ${issue.context}`);
-				console.log("");
+	const launchArgs = process.env.CI
+		? ["--no-sandbox", "--disable-setuid-sandbox"] // needed for GitHub Actions CI environment
+		: [];
+	const browser = await puppeteer.launch({ args: launchArgs });
+	let totalIssues = 0;
+
+	try {
+		for (const url of urls) {
+			const results = await pa11y(url, {
+				browser
 			});
+			console.log(`Accessibility results for ${url}:`);
+			if (results.issues.length === 0) {
+				console.log("- No accessibility issues found.");
+			} else {
+				totalIssues += results.issues.length;
+				results.issues.forEach((issue, idx) => {
+					console.log(`Issue #${idx + 1}:`);
+					console.log(`  Type:      ${issue.type} (code: ${issue.typeCode})`);
+					console.log(`  Message:   ${issue.message}`);
+					console.log(`  Rule:      ${issue.code}`);
+					console.log(`  Selector:  ${issue.selector}`);
+					console.log(`  Context:   ${issue.context}`);
+					console.log("");
+				});
+			}
+			console.log("");
 		}
-		console.log("");
+	} finally {
+		await browser.close();
+	}
+
+	if (totalIssues > 0) {
+		process.exitCode = 1;
 	}
 }
 
