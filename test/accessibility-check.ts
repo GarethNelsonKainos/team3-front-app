@@ -21,7 +21,7 @@ async function runAccessibilityTests() {
 	try {
 		for (const url of urls) {
 			const results = await pa11y(url, {
-				browser
+				browser,
 			});
 			console.log(`Accessibility results for ${url}:`);
 			if (results.issues.length === 0) {
