@@ -6,6 +6,7 @@ import upload from "../utils/upload.js";
 
 interface ErrorWithResponse {
 	response?: {
+		status: number;
 		data?: {
 			message?: string;
 		};
@@ -279,11 +280,19 @@ router.post(
 			const message =
 				(err as ErrorWithResponse).response?.data?.message ??
 				"Error submitting application. Please try again.";
-			res.render("job-role-apply.html", {
-				role,
-				submitted: false,
-				error: message,
-			});
+			if ((err as ErrorWithResponse).response?.status === 400) {
+				res.render("job-role-apply.html", {
+					role,
+					submitted: false,
+					error: message,
+				});
+			} else {
+				res.render("job-role-apply.html", {
+					role,
+					submitted: false,
+					error: "An unexpected error occurred. Please try again.",
+				});
+			}
 		}
 	},
 );
