@@ -1,5 +1,8 @@
 import { type Request, type Response, Router } from "express";
+import FormData from "form-data";
 import jobRoleService from "../services/jobRoleService.js";
+import { uploadCV } from "../services/uploadService.js";
+import upload from "../utils/upload.js";
 
 // Helper functions for query param parsing
 function getString(value: unknown): string | undefined {
@@ -218,16 +221,61 @@ router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
 });
 
 // POST apply form
-router.post("/job-roles/:id/apply", async (req: Request, res: Response) => {
-	try {
-		const id = String(req.params.id);
-		const token = req.cookies?.token as string | undefined;
-		const role = await jobRoleService.getJobRoleById(id, token);
-		res.render("job-role-apply.html", { role, submitted: !!role });
-	} catch (err) {
-		console.error("Failed to submit application", err);
-		res.render("job-role-apply.html", { role: undefined, submitted: false });
-	}
-});
+router.post(
+	"/job-roles/:id/apply",
+	(req, res, next) => {
+		upload.single("cv")(req, res, (err) => {
+			if (err) {
+				return (async () => {
+					const id = String(req.params.id);
+					const token = req.cookies?.token as string | undefined;
+					const role = await jobRoleService.getJobRoleById(id, token);
+					res.render("job-role-apply.html", {
+						role,
+						submitted: false,
+						error: err.message,
+					});
+				})();
+			} else {
+				next();
+			}
+		});
+	},
+	async (req: Request, res: Response) => {
+		let role:
+			| Awaited<ReturnType<typeof jobRoleService.getJobRoleById>>
+			| undefined;
+		try {
+			const id = String(req.params.id);
+			const token = req.cookies?.token as string | undefined;
+			role = await jobRoleService.getJobRoleById(id, token);
+
+			if (!req.file) {
+				return res.render("job-role-apply.html", {
+					role,
+					submitted: false,
+					error: "No file uploaded.",
+				});
+			}
+
+			const formData = new FormData();
+			formData.append("cv", req.file.buffer, {
+				filename: req.file.originalname,
+				contentType: req.file.mimetype,
+			});
+
+			await uploadCV(id, formData, token);
+
+			res.render("job-role-apply.html", { role, submitted: true });
+		} catch (err) {
+			console.error("Failed to submit application", err);
+			res.render("job-role-apply.html", {
+				role,
+				submitted: false,
+				error: "Failed to submit application.",
+			});
+		}
+	},
+);
 
 export default router;

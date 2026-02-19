@@ -33,6 +33,7 @@
 		"@types/axios": "^0.9.36",
 		"@types/cookie-parser": "^1.4.10",
 		"@types/express": "^5.0.6",
+		"@types/multer": "^2.0.0",
 		"@types/node": "^24.0.0",
 		"@types/nunjucks": "^3.2.6",
 		"@types/pa11y": "^5.3.7",
@@ -51,6 +52,7 @@
 		"cookie-parser": "^1.4.7",
 		"dotenv": "^16.0.3",
 		"express": "^5.2.1",
+		"multer": "^2.0.2",
 		"nunjucks": "^3.2.4"
 	}
 }
