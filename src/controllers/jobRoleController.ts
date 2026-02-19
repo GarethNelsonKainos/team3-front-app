@@ -280,7 +280,8 @@ router.post(
 			const message =
 				(err as ErrorWithResponse).response?.data?.message ??
 				"Error submitting application. Please try again.";
-			if ((err as ErrorWithResponse).response?.status === 400) {
+			const status = (err as ErrorWithResponse).response?.status;
+			if (status !== undefined && status >= 400 && status < 500) {
 				res.render("job-role-apply.html", {
 					role,
 					submitted: false,
