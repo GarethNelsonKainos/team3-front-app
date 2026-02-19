@@ -324,7 +324,9 @@ describe("jobRoleController apply routes", () => {
 			});
 
 		expect(res.status).toBe(200);
-		expect(res.text).toContain("Failed to submit application.");
+		expect(res.text).toContain(
+			"Error submitting application. Please try again.",
+		);
 		expect(vi.mocked(axios.post)).toHaveBeenCalled();
 	});
 

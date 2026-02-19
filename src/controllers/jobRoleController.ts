@@ -4,7 +4,14 @@ import jobRoleService from "../services/jobRoleService.js";
 import { uploadCV } from "../services/uploadService.js";
 import upload from "../utils/upload.js";
 
-// Helper functions for query param parsing
+interface ErrorWithResponse {
+	response?: {
+		data?: {
+			message?: string;
+		};
+	};
+}
+
 function getString(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim().length > 0
 		? value.trim()
@@ -269,7 +276,9 @@ router.post(
 			res.render("job-role-apply.html", { role, submitted: true });
 		} catch (err) {
 			console.error("Failed to submit application", err);
-			let message =(err as { response?: { data?: { message?: string } } }).response?.data?.message ?? "Error submitting application. Please try again.";
+			const message =
+				(err as ErrorWithResponse).response?.data?.message ??
+				"Error submitting application. Please try again.";
 			res.render("job-role-apply.html", {
 				role,
 				submitted: false,
