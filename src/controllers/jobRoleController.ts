@@ -8,6 +8,7 @@ import upload from "../utils/upload.js";
 
 interface ErrorWithResponse {
 	response?: {
+		status: number;
 		data?: {
 			message?: string;
 		};

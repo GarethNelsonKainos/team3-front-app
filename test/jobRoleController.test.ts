@@ -390,7 +390,7 @@ describe("jobRoleController apply routes", () => {
 		expect(vi.mocked(axios.post)).not.toHaveBeenCalled();
 	});
 
-	it("POST /job-roles/:id/apply should show backend error if submission fails", async () => {
+	it("POST /job-roles/:id/apply should show generic error if submission fails with no response", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
 		vi.mocked(axios.post).mockRejectedValueOnce(new Error("Backend down"));
 
@@ -404,9 +404,100 @@ describe("jobRoleController apply routes", () => {
 
 		expect(res.status).toBe(200);
 		expect(res.text).toContain(
-			"Error submitting application. Please try again.",
+			"An unexpected error occurred. Please try again.",
 		);
 		expect(vi.mocked(axios.post)).toHaveBeenCalled();
+	});
+
+	it("POST /job-roles/:id/apply should show backend message for 400 errors with message", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(axios.post).mockRejectedValueOnce({
+			response: {
+				status: 400,
+				data: { message: "Invalid CV format or missing required documents" },
+			},
+		});
+
+		const res = await request(app)
+			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token")
+			.attach("cv", Buffer.from("%PDF-1.4 test file"), {
+				filename: "resume.pdf",
+				contentType: "application/pdf",
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain(
+			"Invalid CV format or missing required documents",
+		);
+		expect(res.text).not.toContain("An unexpected error occurred");
+	});
+
+	it("POST /job-roles/:id/apply should show default message for 400 errors without message", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(axios.post).mockRejectedValueOnce({
+			response: {
+				status: 400,
+				data: {},
+			},
+		});
+
+		const res = await request(app)
+			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token")
+			.attach("cv", Buffer.from("%PDF-1.4 test file"), {
+				filename: "resume.pdf",
+				contentType: "application/pdf",
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain(
+			"Error submitting application. Please try again.",
+		);
+	});
+
+	it("POST /job-roles/:id/apply should show generic error for non-400 server errors", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(axios.post).mockRejectedValueOnce({
+			response: {
+				status: 500,
+				data: { message: "Internal server error" },
+			},
+		});
+
+		const res = await request(app)
+			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token")
+			.attach("cv", Buffer.from("%PDF-1.4 test file"), {
+				filename: "resume.pdf",
+				contentType: "application/pdf",
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain(
+			"An unexpected error occurred. Please try again.",
+		);
+		expect(res.text).not.toContain("Internal server error");
+	});
+
+	it("POST /job-roles/:id/apply should show generic error for errors without response", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(axios.post).mockRejectedValueOnce({
+			message: "Network error",
+		});
+
+		const res = await request(app)
+			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token")
+			.attach("cv", Buffer.from("%PDF-1.4 test file"), {
+				filename: "resume.pdf",
+				contentType: "application/pdf",
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain(
+			"An unexpected error occurred. Please try again.",
+		);
 	});
 
 	it("POST /job-roles/:id/apply should show not found if role missing", async () => {
