@@ -408,6 +408,28 @@ body {
 	color: var(--kainos-blue);
 }
 
+.nav .nav-form {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+
+.nav .link-button {
+	background: none;
+	border: none;
+	font: inherit;
+	color: var(--kainos-grey);
+	text-decoration: none;
+	margin-left: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0;
+}
+
+.nav .link-button:hover {
+	color: var(--kainos-blue);
+}
+
 .hero {
 	padding: 24px 20px;
 }
