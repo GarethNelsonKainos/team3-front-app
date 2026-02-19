@@ -8,8 +8,10 @@ const urls = [
 	"http://localhost:3000/job-role-list", // Job Role List
 	"http://localhost:3000/job-role-information", // Job Role Information
 	"http://localhost:3000/job-role-apply", // Job Role Apply
-	"http://localhost:3000/job-applications", // Job Applications
 ];
+if (process.env.FEATURE_JOB_APPLICATIONS === "true") {
+	urls.push("http://localhost:3000/job-applications"); // Job Applications
+}
 
 async function runAccessibilityTests() {
 	const launchArgs = process.env.CI
@@ -40,6 +42,9 @@ async function runAccessibilityTests() {
 			}
 			console.log("");
 		}
+	} catch (error) {
+		console.error("Error running accessibility tests: ", error);
+		process.exitCode = 1;
 	} finally {
 		await browser.close();
 	}
