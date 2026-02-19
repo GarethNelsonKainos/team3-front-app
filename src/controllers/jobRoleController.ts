@@ -1,7 +1,18 @@
 import axios, { type AxiosError, isAxiosError } from "axios";
 import { type Request, type Response, Router } from "express";
 import multer from "multer";
+import FormData from "form-data";
 import jobRoleService from "../services/jobRoleService.js";
+import { uploadCV } from "../services/uploadService.js";
+import upload from "../utils/upload.js";
+
+interface ErrorWithResponse {
+	response?: {
+		data?: {
+			message?: string;
+		};
+	};
+}
 
 // ...existing code...
 const router = Router();
@@ -398,59 +409,59 @@ router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
 // POST apply form
 router.post(
 	"/job-roles/:id/apply",
-	uploadCv.single("cv"),
+	(req, res, next) => {
+		upload.single("cv")(req, res, (err) => {
+			if (err) {
+				return (async () => {
+					const id = String(req.params.id);
+					const token = req.cookies?.token as string | undefined;
+					const role = await jobRoleService.getJobRoleById(id, token);
+					res.render("job-role-apply.html", {
+						role,
+						submitted: false,
+						error: err.message,
+					});
+				})();
+			} else {
+				next();
+			}
+		});
+	},
 	async (req: Request, res: Response) => {
+		let role:
+			| Awaited<ReturnType<typeof jobRoleService.getJobRoleById>>
+			| undefined;
 		try {
 			const id = String(req.params.id);
 			const token = req.cookies?.token as string | undefined;
-			if (!token) {
-				res.redirect("/login");
-				return;
-			}
-
-			const role = await jobRoleService.getJobRoleById(id, token);
-			if (!role) {
-				res.render("job-role-apply.html", {
-					role: undefined,
-					submitted: false,
-					applyError: undefined,
-				});
-				return;
-			}
+			role = await jobRoleService.getJobRoleById(id, token);
 
 			if (!req.file) {
-				res.render("job-role-apply.html", {
+				return res.render("job-role-apply.html", {
 					role,
 					submitted: false,
-					applyError: "Please upload your CV as a PDF file.",
+					error: "No file uploaded.",
 				});
-				return;
 			}
 
-			if (req.file.mimetype !== "application/pdf") {
-				res.render("job-role-apply.html", {
-					role,
-					submitted: false,
-					applyError: "Only PDF files are supported.",
-				});
-				return;
-			}
-
-			await jobRoleService.applyForJobRole(id, req.file, token);
-			res.render("job-role-apply.html", {
-				role,
-				submitted: true,
-				applyError: undefined,
+			const formData = new FormData();
+			formData.append("cv", req.file.buffer, {
+				filename: req.file.originalname,
+				contentType: req.file.mimetype,
 			});
+
+			await uploadCV(id, formData, token);
+
+			res.render("job-role-apply.html", { role, submitted: true });
 		} catch (err) {
 			console.error("Failed to submit application", err);
-			const id = String(req.params.id);
-			const token = req.cookies?.token as string | undefined;
-			const role = await jobRoleService.getJobRoleById(id, token);
+			const message =
+				(err as ErrorWithResponse).response?.data?.message ??
+				"Error submitting application. Please try again.";
 			res.render("job-role-apply.html", {
 				role,
 				submitted: false,
-				applyError: getAxiosMessage(err) || "Failed to submit application.",
+				error: message,
 			});
 		}
 	},

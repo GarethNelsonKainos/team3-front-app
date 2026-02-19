@@ -429,6 +429,28 @@ body {
 	color: var(--kainos-blue);
 }
 
+.nav .nav-form {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+
+.nav .link-button {
+	background: none;
+	border: none;
+	font: inherit;
+	color: var(--kainos-grey);
+	text-decoration: none;
+	margin-left: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0;
+}
+
+.nav .link-button:hover {
+	color: var(--kainos-blue);
+}
+
 .hero {
 	padding: 24px 20px;
 }
@@ -531,6 +553,9 @@ body {
 
 .form-field input[type="file"] {
 	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	display: block;
 	border: 1px dashed rgba(40, 53, 131, 0.35);
 	border-radius: 10px;
 	padding: 14px;
@@ -567,10 +592,34 @@ body {
 	font-weight: 600;
 }
 
+/*
 .status-banner {
 	background: rgba(97, 168, 63, 0.12);
 	border: 1px solid rgba(97, 168, 63, 0.4);
 	color: #1a4d2a;
+	padding: 12px 14px;
+	border-radius: 10px;
+	font-weight: 600;
+}
+*/
+
+.status-banner-success {
+	background: rgba(40,167,69,0.12);
+	border: 1px solid rgba(97, 168, 63, 0.4);
+	border-color: rgba(40,167,69,0.4);
+	color: #155724;
+	margin-bottom: 16px;
+	padding: 12px 14px;
+	border-radius: 10px;
+	font-weight: 600;
+}
+
+.status-banner-error {
+	background: rgba(220,53,69,0.12);
+	border: 1px solid rgba(97, 168, 63, 0.4);
+	border-color: rgba(220,53,69,0.4);
+	color: #842029;
+	margin-bottom: 16px;
 	padding: 12px 14px;
 	border-radius: 10px;
 	font-weight: 600;
@@ -746,4 +795,8 @@ body {
 	margin-top: 16px;
 	color: var(--kainos-grey);
 	font-weight: 600;
+}
+
+.auth-link a {
+	color: var(--kainos-blue);
 }

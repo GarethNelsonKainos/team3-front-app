@@ -1,4 +1,5 @@
 import path from "node:path";
+import axios from "axios";
 import cookieParser from "cookie-parser";
 import express from "express";
 import nunjucks from "nunjucks";
@@ -49,6 +50,11 @@ const mockRoleDetail = {
 };
 
 vi.mock("../src/services/jobRoleService");
+vi.mock("axios", () => ({
+	default: {
+		post: vi.fn(),
+	},
+}));
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -355,25 +361,52 @@ describe("jobRoleController apply routes", () => {
 		const res = await request(app)
 			.post("/job-roles/1/apply")
 			.set("Cookie", "token=test-jwt-token")
-			.attach("cv", Buffer.from("fake-pdf-content"), {
-				filename: "fakefile.pdf",
+			.attach("cv", Buffer.from("%PDF-1.4 test file"), {
+				filename: "resume.pdf",
 				contentType: "application/pdf",
 			});
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Your application has been submitted");
 		expect(res.text).toContain("In progress");
+		expect(vi.mocked(axios.post)).toHaveBeenCalled();
 		expect(vi.mocked(jobRoleService.getJobRoleById)).toHaveBeenCalledWith(
 			"1",
 			"test-jwt-token",
 		);
-		expect(vi.mocked(jobRoleService.applyForJobRole)).toHaveBeenCalledWith(
-			"1",
-			expect.objectContaining({
-				originalname: "fakefile.pdf",
-				mimetype: "application/pdf",
-			}),
-			"test-jwt-token",
+	});
+
+	it("POST /job-roles/:id/apply should show upload validation error for invalid file type", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		const res = await request(app)
+			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token")
+			.attach("cv", Buffer.from("not a cv"), {
+				filename: "resume.png",
+				contentType: "image/png",
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Only PDF, DOC, and DOCX files are allowed.");
+		expect(vi.mocked(axios.post)).not.toHaveBeenCalled();
+	});
+
+	it("POST /job-roles/:id/apply should show backend error if submission fails", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(axios.post).mockRejectedValueOnce(new Error("Backend down"));
+
+		const res = await request(app)
+			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token")
+			.attach("cv", Buffer.from("%PDF-1.4 test file"), {
+				filename: "resume.pdf",
+				contentType: "application/pdf",
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain(
+			"Error submitting application. Please try again.",
 		);
+		expect(vi.mocked(axios.post)).toHaveBeenCalled();
 	});
 
 	it("POST /job-roles/:id/apply should show not found if role missing", async () => {
