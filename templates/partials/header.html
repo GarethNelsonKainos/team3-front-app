@@ -6,9 +6,8 @@
       <a href="/">Home</a>
       <a href="/job-roles">Job roles</a>
       {% if token %}
-        <form action="/logout" method="post" style="display:inline; margin:0; padding:0;">
-          <button type="submit" class="link-button">Logout</button>
-        </form>
+        <a href="/logout" class="link-button" onclick="event.preventDefault(); this.nextElementSibling.submit();">Logout</a>
+        <form action="/logout" method="post" style="display:none; margin:0; padding:0;"></form>
       {% else %}
         <a href="/login">Login</a>
       {% endif %}
