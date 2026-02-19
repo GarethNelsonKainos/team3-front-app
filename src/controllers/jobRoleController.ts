@@ -1,5 +1,48 @@
+import axios, { type AxiosError, isAxiosError } from "axios";
 import { type Request, type Response, Router } from "express";
+import multer from "multer";
 import jobRoleService from "../services/jobRoleService.js";
+
+// ...existing code...
+const router = Router();
+
+// Proxy route for CV download (admin only)
+router.get("/api/applications/cv", async (req: Request, res: Response) => {
+	const key = req.query.key;
+	const token = req.cookies?.token as string | undefined;
+	if (!key || typeof key !== "string") {
+		return res.status(400).send("Missing or invalid key parameter");
+	}
+	if (!token) {
+		return res.status(401).send("Not authenticated");
+	}
+	try {
+		// Call backend API to get the presigned URL (will 302 redirect)
+		const backendUrl = `${process.env.API_BASE_URL || "http://localhost:3001"}/api/applications/cv?key=${encodeURIComponent(key)}`;
+		// Use axios to follow up to 0 redirects so we can capture the Location header
+		const response = await axios.get(backendUrl, {
+			headers: { Authorization: `Bearer ${token}` },
+			maxRedirects: 0,
+			validateStatus: (status: number) => status === 302,
+		});
+		const location = response.headers["location"];
+		if (location) {
+			// Redirect the browser to the presigned S3 URL
+			return res.redirect(location);
+		} else {
+			return res.status(500).send("Failed to get CV download URL");
+		}
+	} catch (err: unknown) {
+		if (isAxiosError(err) && err.response?.status === 302) {
+			const location = err.response.headers["location"];
+			if (location) {
+				return res.redirect(location);
+			}
+		}
+		return res.status(500).send("Failed to get CV download URL");
+	}
+});
+
 
 // Helper functions for query param parsing
 function getString(value: unknown): string | undefined {
@@ -32,7 +75,11 @@ const getAxiosMessage = (err: unknown): string | undefined => {
 	return axiosErr.response?.data?.message;
 };
 
-const router = Router();
+// ...existing code...
+const uploadCv = multer({
+	storage: multer.memoryStorage(),
+	limits: { fileSize: 10 * 1024 * 1024 },
+});
 
 router.get("/job-roles", async (req: Request, res: Response) => {
 	try {
@@ -333,24 +380,80 @@ router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
 		const id = String(req.params.id);
 		const token = req.cookies?.token as string | undefined;
 		const role = await jobRoleService.getJobRoleById(id, token);
-		res.render("job-role-apply.html", { role, submitted: false });
+		res.render("job-role-apply.html", {
+			role,
+			submitted: false,
+			applyError: undefined,
+		});
 	} catch (err) {
 		console.error("Failed to load apply form", err);
-		res.render("job-role-apply.html", { role: undefined, submitted: false });
+		res.render("job-role-apply.html", {
+			role: undefined,
+			submitted: false,
+			applyError: undefined,
+		});
 	}
 });
 
 // POST apply form
-router.post("/job-roles/:id/apply", async (req: Request, res: Response) => {
-	try {
-		const id = String(req.params.id);
-		const token = req.cookies?.token as string | undefined;
-		const role = await jobRoleService.getJobRoleById(id, token);
-		res.render("job-role-apply.html", { role, submitted: !!role });
-	} catch (err) {
-		console.error("Failed to submit application", err);
-		res.render("job-role-apply.html", { role: undefined, submitted: false });
-	}
-});
+router.post(
+	"/job-roles/:id/apply",
+	uploadCv.single("cv"),
+	async (req: Request, res: Response) => {
+		try {
+			const id = String(req.params.id);
+			const token = req.cookies?.token as string | undefined;
+			if (!token) {
+				res.redirect("/login");
+				return;
+			}
+
+			const role = await jobRoleService.getJobRoleById(id, token);
+			if (!role) {
+				res.render("job-role-apply.html", {
+					role: undefined,
+					submitted: false,
+					applyError: undefined,
+				});
+				return;
+			}
+
+			if (!req.file) {
+				res.render("job-role-apply.html", {
+					role,
+					submitted: false,
+					applyError: "Please upload your CV as a PDF file.",
+				});
+				return;
+			}
+
+			if (req.file.mimetype !== "application/pdf") {
+				res.render("job-role-apply.html", {
+					role,
+					submitted: false,
+					applyError: "Only PDF files are supported.",
+				});
+				return;
+			}
+
+			await jobRoleService.applyForJobRole(id, req.file, token);
+			res.render("job-role-apply.html", {
+				role,
+				submitted: true,
+				applyError: undefined,
+			});
+		} catch (err) {
+			console.error("Failed to submit application", err);
+			const id = String(req.params.id);
+			const token = req.cookies?.token as string | undefined;
+			const role = await jobRoleService.getJobRoleById(id, token);
+			res.render("job-role-apply.html", {
+				role,
+				submitted: false,
+				applyError: getAxiosMessage(err) || "Failed to submit application.",
+			});
+		}
+	},
+);
 
 export default router;

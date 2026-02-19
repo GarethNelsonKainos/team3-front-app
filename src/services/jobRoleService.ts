@@ -1,4 +1,21 @@
 import axios from "axios";
+import FormData from "form-data";
+
+const API_TIMEOUT_MS = Number(process.env.API_TIMEOUT_MS ?? 30000);
+
+export interface ApplyForRoleResponse {
+	applicationId: number;
+	userId: number;
+	jobRoleId: number;
+	applicationStatus: string;
+	cvUrl: string;
+}
+
+export interface UploadCvFile {
+	buffer: Buffer;
+	originalname: string;
+	mimetype: string;
+}
 
 export interface JobRoleResponse {
 	jobRoleId: number;
@@ -85,7 +102,11 @@ export async function getOpenJobRoles(
 	if (filters.limit !== undefined) params.set("limit", String(filters.limit));
 	if (filters.offset !== undefined)
 		params.set("offset", String(filters.offset));
-	const resp = await axios.get<JobRoleResponse[]>(url, { params, headers });
+	const resp = await axios.get<JobRoleResponse[]>(url, {
+		params,
+		headers,
+		timeout: API_TIMEOUT_MS,
+	});
 	const totalHeader = resp.headers?.["x-total-count"];
 	const totalCount = totalHeader ? Number.parseInt(totalHeader, 10) : undefined;
 	return {
@@ -104,6 +125,7 @@ export async function getJobRoleById(
 		const resp = await axios.get<JobRoleResponse>(url, {
 			headers,
 			withCredentials: true,
+			timeout: API_TIMEOUT_MS,
 		});
 		return resp.data;
 	} catch (err: unknown) {
@@ -121,7 +143,10 @@ export async function getJobRoleApplications(
 ): Promise<JobRoleApplicationResponse[]> {
 	const url = `${getApiBase()}/api/job-roles/${jobRoleId}/applications`;
 	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-	const resp = await axios.get<JobRoleApplicationResponse[]>(url, { headers });
+	const resp = await axios.get<JobRoleApplicationResponse[]>(url, {
+		headers,
+		timeout: API_TIMEOUT_MS,
+	});
 	return resp.data || [];
 }
 
@@ -131,7 +156,7 @@ export async function hireApplication(
 ): Promise<void> {
 	const url = `${getApiBase()}/api/applications/${applicationId}/hire`;
 	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-	await axios.put(url, undefined, { headers });
+	await axios.put(url, undefined, { headers, timeout: API_TIMEOUT_MS });
 }
 
 export async function rejectApplication(
@@ -140,7 +165,30 @@ export async function rejectApplication(
 ): Promise<void> {
 	const url = `${getApiBase()}/api/applications/${applicationId}/reject`;
 	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-	await axios.put(url, undefined, { headers });
+	await axios.put(url, undefined, { headers, timeout: API_TIMEOUT_MS });
+}
+
+export async function applyForJobRole(
+	jobRoleId: number | string,
+	cvFile: UploadCvFile,
+	token?: string,
+): Promise<ApplyForRoleResponse> {
+	const url = `${getApiBase()}/api/job-roles/${jobRoleId}/apply`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+	const formData = new FormData();
+	formData.append("cv", cvFile.buffer, {
+		filename: cvFile.originalname,
+		contentType: cvFile.mimetype,
+		knownLength: cvFile.buffer.length,
+	});
+	const formHeaders = formData.getHeaders();
+	const combinedHeaders = { ...(headers ?? {}), ...formHeaders };
+	const resp = await axios.post<ApplyForRoleResponse>(url, formData, {
+		headers: combinedHeaders,
+		timeout: API_TIMEOUT_MS,
+		maxBodyLength: Number.POSITIVE_INFINITY,
+	});
+	return resp.data;
 }
 
 export default {
@@ -149,4 +197,5 @@ export default {
 	getJobRoleApplications,
 	hireApplication,
 	rejectApplication,
+	applyForJobRole,
 };

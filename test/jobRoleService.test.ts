@@ -6,11 +6,13 @@ vi.mock("axios", () => ({
 	default: {
 		get: vi.fn(),
 		put: vi.fn(),
+		post: vi.fn(),
 	},
 }));
 const mockedAxios = axios as unknown as {
 	get: ReturnType<typeof vi.fn>;
 	put: ReturnType<typeof vi.fn>;
+	post: ReturnType<typeof vi.fn>;
 };
 const apiBaseUrl = "http://example.test";
 
@@ -42,6 +44,7 @@ describe("getOpenJobRoles", () => {
 			{
 				params: new URLSearchParams(),
 				headers: { Authorization: `Bearer ${token}` },
+				timeout: 30000,
 			},
 		);
 		expect(result).toEqual({ roles: [], totalCount: undefined });
@@ -58,6 +61,7 @@ describe("getOpenJobRoles", () => {
 			{
 				params: new URLSearchParams(),
 				headers: undefined,
+				timeout: 30000,
 			},
 		);
 		expect(result).toEqual({ roles: [], totalCount: undefined });
@@ -97,6 +101,7 @@ describe("getJobRoleById", () => {
 			{
 				headers: { Authorization: `Bearer ${token}` },
 				withCredentials: true,
+				timeout: 30000,
 			},
 		);
 		expect(result).toEqual(mockRole);
@@ -133,6 +138,7 @@ describe("getJobRoleById", () => {
 			{
 				headers: undefined,
 				withCredentials: true,
+				timeout: 30000,
 			},
 		);
 		expect(result).toEqual(mockRole);
@@ -160,7 +166,7 @@ describe("application admin methods", () => {
 
 		expect(mockedAxios.get).toHaveBeenCalledWith(
 			`${apiBaseUrl}/api/job-roles/99/applications`,
-			{ headers: { Authorization: "Bearer test-token" } },
+			{ headers: { Authorization: "Bearer test-token" }, timeout: 30000 },
 		);
 		expect(result).toHaveLength(1);
 	});
@@ -174,7 +180,7 @@ describe("application admin methods", () => {
 		expect(mockedAxios.put).toHaveBeenCalledWith(
 			`${apiBaseUrl}/api/applications/12/hire`,
 			undefined,
-			{ headers: { Authorization: "Bearer test-token" } },
+			{ headers: { Authorization: "Bearer test-token" }, timeout: 30000 },
 		);
 	});
 
@@ -187,7 +193,41 @@ describe("application admin methods", () => {
 		expect(mockedAxios.put).toHaveBeenCalledWith(
 			`${apiBaseUrl}/api/applications/13/reject`,
 			undefined,
-			{ headers: { Authorization: "Bearer test-token" } },
+			{ headers: { Authorization: "Bearer test-token" }, timeout: 30000 },
 		);
+	});
+
+	it("submits job application with cv file", async () => {
+		const jobRoleService = await loadJobRoleService();
+		mockedAxios.post.mockResolvedValue({
+			data: {
+				applicationId: 1,
+				userId: 2,
+				jobRoleId: 99,
+				applicationStatus: "InProgress",
+				cvUrl: "applications/test-cv.pdf",
+			},
+		});
+
+		const result = await jobRoleService.applyForJobRole(
+			99,
+			{
+				buffer: Buffer.from("test"),
+				originalname: "test-cv.pdf",
+				mimetype: "application/pdf",
+			},
+			"test-token",
+		);
+
+		expect(mockedAxios.post).toHaveBeenCalledWith(
+			`${apiBaseUrl}/api/job-roles/99/apply`,
+			expect.any(FormData),
+			expect.objectContaining({
+				headers: expect.objectContaining({
+					Authorization: "Bearer test-token",
+				}),
+			}),
+		);
+		expect(result.applicationStatus).toBe("InProgress");
 	});
 });

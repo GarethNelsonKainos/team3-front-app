@@ -70,9 +70,10 @@
               <tr>
                 <td>
                   {% if application.cvUrl %}
-                  <a class="table-link" href="{{ application.cvUrl }}" target="_blank" rel="noopener noreferrer">
+                  <a class="table-link" href="/api/applications/cv?key={{ application.cvUrl | urlencode }}" target="_blank" rel="noopener noreferrer">
                     {{ application.applicantName }}
                   </a>
+
                   {% else %}
                     {{ application.applicantName }}
                   {% endif %}

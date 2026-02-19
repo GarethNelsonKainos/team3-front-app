@@ -317,6 +317,13 @@ describe("jobRoleController", () => {
 describe("jobRoleController apply routes", () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
+		vi.mocked(jobRoleService.applyForJobRole).mockResolvedValue({
+			applicationId: 1,
+			userId: 2,
+			jobRoleId: 1,
+			applicationStatus: "InProgress",
+			cvUrl: "applications/cv.pdf",
+		});
 	});
 
 	it("GET /job-roles/:id/apply should render apply form if role exists", async () => {
@@ -348,13 +355,23 @@ describe("jobRoleController apply routes", () => {
 		const res = await request(app)
 			.post("/job-roles/1/apply")
 			.set("Cookie", "token=test-jwt-token")
-			.type("form")
-			.send({ cv: "fakefile.pdf" });
+			.attach("cv", Buffer.from("fake-pdf-content"), {
+				filename: "fakefile.pdf",
+				contentType: "application/pdf",
+			});
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Your application has been submitted");
 		expect(res.text).toContain("In progress");
 		expect(vi.mocked(jobRoleService.getJobRoleById)).toHaveBeenCalledWith(
 			"1",
+			"test-jwt-token",
+		);
+		expect(vi.mocked(jobRoleService.applyForJobRole)).toHaveBeenCalledWith(
+			"1",
+			expect.objectContaining({
+				originalname: "fakefile.pdf",
+				mimetype: "application/pdf",
+			}),
 			"test-jwt-token",
 		);
 	});
@@ -364,10 +381,22 @@ describe("jobRoleController apply routes", () => {
 		const res = await request(app)
 			.post("/job-roles/999/apply")
 			.set("Cookie", "token=test-jwt-token")
-			.type("form")
-			.send({ cv: "fakefile.pdf" });
+			.attach("cv", Buffer.from("fake-pdf-content"), {
+				filename: "fakefile.pdf",
+				contentType: "application/pdf",
+			});
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Job role not found");
+	});
+
+	it("POST /job-roles/:id/apply should show validation error when cv is missing", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		const res = await request(app)
+			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token");
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Please upload your CV as a PDF file.");
+		expect(vi.mocked(jobRoleService.applyForJobRole)).not.toHaveBeenCalled();
 	});
 
 	it("GET /job-roles/:id should show apply button if open and positions > 0", async () => {
