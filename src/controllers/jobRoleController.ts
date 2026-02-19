@@ -453,18 +453,24 @@ router.post(
 			await uploadCV(id, formData, token);
 
 			res.render("job-role-apply.html", { role, submitted: true });
-		} catch (err) {
-			console.error("Failed to submit application", err);
-			const message =
-				(err as ErrorWithResponse).response?.data?.message ??
-				"Error submitting application. Please try again.";
-			res.render("job-role-apply.html", {
-				role,
-				submitted: false,
-				applyError: message,
-			});
-		}
-	},
+		   } catch (err) {
+			   console.error("Failed to submit application", err);
+			   const errorResponse = (err as ErrorWithResponse).response;
+			   let message: string;
+			   if (errorResponse?.status === 400) {
+				   message =
+					   errorResponse.data?.message ||
+					   "Error submitting application. Please try again.";
+			   } else {
+				   message = "An unexpected error occurred. Please try again.";
+			   }
+			   res.render("job-role-apply.html", {
+				   role,
+				   submitted: false,
+				   applyError: message,
+			   });
+	   }
+   },
 );
 
 export default router;
