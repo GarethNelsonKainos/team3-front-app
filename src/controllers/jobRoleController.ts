@@ -19,17 +19,17 @@ const router = Router();
 
 // Proxy route for CV download (admin only)
 router.get("/api/applications/cv", async (req: Request, res: Response) => {
-	const key = req.query.key;
+	const applicationId = req.query.applicationId;
 	const token = req.cookies?.token as string | undefined;
-	if (!key || typeof key !== "string") {
-		return res.status(400).send("Missing or invalid key parameter");
+	if (!applicationId || typeof applicationId !== "string") {
+		return res.status(400).send("Missing or invalid applicationId parameter");
 	}
 	if (!token) {
 		return res.status(401).send("Not authenticated");
 	}
 	try {
-		// Call backend API to get the presigned URL (will 302 redirect)
-		const backendUrl = `${process.env.API_BASE_URL || "http://localhost:3001"}/api/applications/cv?key=${encodeURIComponent(key)}`;
+		// Call backend API to get the presigned URL or redirect
+		const backendUrl = `${process.env.API_BASE_URL || "http://localhost:3001"}/api/applications/cv?applicationId=${encodeURIComponent(applicationId)}`;
 		// Use axios to follow up to 0 redirects so we can capture the Location header
 		const response = await axios.get(backendUrl, {
 			headers: { Authorization: `Bearer ${token}` },
