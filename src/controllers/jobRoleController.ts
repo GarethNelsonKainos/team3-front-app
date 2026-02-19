@@ -269,10 +269,11 @@ router.post(
 			res.render("job-role-apply.html", { role, submitted: true });
 		} catch (err) {
 			console.error("Failed to submit application", err);
+			let message =(err as { response?: { data?: { message?: string } } }).response?.data?.message ?? "Error submitting application. Please try again.";
 			res.render("job-role-apply.html", {
 				role,
 				submitted: false,
-				error: "Failed to submit application.",
+				error: message,
 			});
 		}
 	},
