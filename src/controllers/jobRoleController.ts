@@ -1,7 +1,7 @@
 import axios, { type AxiosError, isAxiosError } from "axios";
 import { type Request, type Response, Router } from "express";
-import multer from "multer";
 import FormData from "form-data";
+import multer from "multer";
 import jobRoleService from "../services/jobRoleService.js";
 import { uploadCV } from "../services/uploadService.js";
 import upload from "../utils/upload.js";
@@ -53,7 +53,6 @@ router.get("/api/applications/cv", async (req: Request, res: Response) => {
 		return res.status(500).send("Failed to get CV download URL");
 	}
 });
-
 
 // Helper functions for query param parsing
 function getString(value: unknown): string | undefined {
@@ -419,7 +418,7 @@ router.post(
 					res.render("job-role-apply.html", {
 						role,
 						submitted: false,
-						error: err.message,
+						applyError: err.message,
 					});
 				})();
 			} else {
@@ -440,7 +439,7 @@ router.post(
 				return res.render("job-role-apply.html", {
 					role,
 					submitted: false,
-					error: "No file uploaded.",
+					applyError: "Please upload your CV as a PDF file.",
 				});
 			}
 
@@ -461,7 +460,7 @@ router.post(
 			res.render("job-role-apply.html", {
 				role,
 				submitted: false,
-				error: message,
+				applyError: message,
 			});
 		}
 	},

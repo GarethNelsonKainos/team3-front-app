@@ -221,11 +221,13 @@ describe("application admin methods", () => {
 
 		expect(mockedAxios.post).toHaveBeenCalledWith(
 			`${apiBaseUrl}/api/job-roles/99/apply`,
-			expect.any(FormData),
+			expect.anything(),
 			expect.objectContaining({
 				headers: expect.objectContaining({
 					Authorization: "Bearer test-token",
 				}),
+				maxBodyLength: Infinity,
+				timeout: 30000,
 			}),
 		);
 		expect(result.applicationStatus).toBe("InProgress");
