@@ -25,3 +25,22 @@ jobs:
 
     - name: Run tests
       run: npm run test
+
+    - name: Start dev server
+      run: |
+        npm run dev &
+        echo $! > dev-server.pid
+
+    - name: Wait for server to be ready
+      run: npx wait-on http://localhost:3000 --timeout 60000
+
+    - name: Run accessibility tests
+      run: npm run accessibility
+
+    - name: Stop dev server
+      if: always()
+      run: |
+        if [ -f dev-server.pid ]; then
+          kill "$(cat dev-server.pid)" || true
+          rm dev-server.pid
+        fi
