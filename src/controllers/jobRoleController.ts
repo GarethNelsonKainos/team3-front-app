@@ -275,8 +275,9 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 			}
 		}
 
+		const isAdmin = applicationsPanel.visible;
 		let canApply = false;
-		if (role && (role.numberOfOpenPositions ?? 0) > 0) {
+		if (role && (role.numberOfOpenPositions ?? 0) > 0 && !isAdmin) {
 			canApply = true;
 		}
 		res.render("job-role-information.html", {
