@@ -2,6 +2,7 @@ import { type AxiosError, isAxiosError } from "axios";
 import { type Request, type Response, Router } from "express";
 import FormData from "form-data";
 import multer from "multer";
+import { mapApplicationsToPanelItems } from "../mappers/applicationPanelItemMapper.js";
 import { getCvDownloadUrl } from "../services/applicationService.js";
 import jobRoleService from "../services/jobRoleService.js";
 import { uploadCV } from "../services/uploadService.js";
@@ -263,9 +264,6 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 					token,
 				);
 				applicationsPanel.visible = true;
-				const { mapApplicationsToPanelItems } = await import(
-					"../mappers/applicationPanelItemMapper.js"
-				);
 				applicationsPanel.items = mapApplicationsToPanelItems(applications);
 			} catch (err) {
 				const status = getAxiosStatus(err);
@@ -347,32 +345,6 @@ router.post(
 				getAxiosMessage(err) || "Could not reject applicant.",
 			);
 			res.redirect(`/applications/${applicationId}?error=${error}`);
-			return;
-		}
-	},
-);
-
-router.post(
-	"/job-roles/:id/applications/:applicationId/reject",
-	async (req: Request, res: Response) => {
-		const roleId = String(req.params.id);
-		const applicationId = String(req.params.applicationId);
-		const token = req.cookies?.token as string | undefined;
-		if (!token) {
-			res.redirect("/login");
-			return;
-		}
-
-		try {
-			await jobRoleService.rejectApplication(applicationId, token);
-			const success = encodeURIComponent("Application marked as Rejected.");
-			res.redirect(`/job-roles/${roleId}?success=${success}`);
-			return;
-		} catch (err) {
-			const error = encodeURIComponent(
-				getAxiosMessage(err) || "Could not reject applicant.",
-			);
-			res.redirect(`/job-roles/${roleId}?error=${error}`);
 			return;
 		}
 	},
