@@ -1,10 +1,15 @@
-
-import type { ApplyForRoleResponse, UploadCvFile } from "../types/applicationService.js";
-import type { JobRoleResponse, JobRoleFilters, JobRoleListResponse } from "../types/jobRole.js";
-import type { JobRoleApplicationResponse } from "../types/jobRoleApplication.js";
-
 import axios from "axios";
 import FormData from "form-data";
+import type {
+	ApplyForRoleResponse,
+	UploadCvFile,
+} from "../types/applicationService.js";
+import type {
+	JobRoleFilters,
+	JobRoleListResponse,
+	JobRoleResponse,
+} from "../types/jobRole.js";
+import type { JobRoleApplicationResponse } from "../types/jobRoleApplication.js";
 
 const API_TIMEOUT_MS = Number(process.env.API_TIMEOUT_MS ?? 30000);
 

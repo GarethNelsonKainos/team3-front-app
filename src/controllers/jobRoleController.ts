@@ -1,11 +1,11 @@
 import { type AxiosError, isAxiosError } from "axios";
 import { type Request, type Response, Router } from "express";
-import type { ApplicationPanelItem } from "../types/application";
 import FormData from "form-data";
 import multer from "multer";
+import { getCvDownloadUrl } from "../services/applicationService.js";
 import jobRoleService from "../services/jobRoleService.js";
 import { uploadCV } from "../services/uploadService.js";
-import { getCvDownloadUrl } from "../services/applicationService.js";
+import type { ApplicationPanelItem } from "../types/application";
 import upload from "../utils/upload.js";
 
 interface ErrorWithResponse {
@@ -25,7 +25,9 @@ router.get("/api/applications/cv", async (req: Request, res: Response) => {
 	const applicationId = req.query.applicationId;
 	const token = req.cookies?.token as string | undefined;
 	if (!applicationId || typeof applicationId !== "string") {
-		return res.render("error.html", { message: "Missing or invalid applicationId parameter" });
+		return res.render("error.html", {
+			message: "Missing or invalid applicationId parameter",
+		});
 	}
 	if (!token) {
 		return res.render("error.html", { message: "Not authenticated" });
@@ -35,7 +37,9 @@ router.get("/api/applications/cv", async (req: Request, res: Response) => {
 		return res.redirect(location);
 	} catch (err) {
 		console.error("Failed to get CV download URL", err);
-		return res.render("error.html", { message: "Failed to get CV download URL" });
+		return res.render("error.html", {
+			message: "Failed to get CV download URL",
+		});
 	}
 });
 
@@ -254,9 +258,14 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 
 		if (role && token) {
 			try {
-				const applications = await jobRoleService.getJobRoleApplications(id, token);
+				const applications = await jobRoleService.getJobRoleApplications(
+					id,
+					token,
+				);
 				applicationsPanel.visible = true;
-				const { mapApplicationsToPanelItems } = await import("../mappers/applicationPanelItemMapper.js");
+				const { mapApplicationsToPanelItems } = await import(
+					"../mappers/applicationPanelItemMapper.js"
+				);
 				applicationsPanel.items = mapApplicationsToPanelItems(applications);
 			} catch (err) {
 				const status = getAxiosStatus(err);
@@ -292,7 +301,6 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 	}
 });
 
-
 router.post(
 	"/applications/:applicationId/hire",
 	async (req: Request, res: Response) => {
@@ -311,14 +319,13 @@ router.post(
 			return;
 		} catch (err) {
 			const error = encodeURIComponent(
-				getAxiosMessage(err) || "Could not hire applicant."
+				getAxiosMessage(err) || "Could not hire applicant.",
 			);
 			res.redirect(`/applications/${applicationId}?error=${error}`);
 			return;
 		}
-	}
+	},
 );
-
 
 router.post(
 	"/applications/:applicationId/reject",
@@ -337,12 +344,12 @@ router.post(
 			return;
 		} catch (err) {
 			const error = encodeURIComponent(
-				getAxiosMessage(err) || "Could not reject applicant."
+				getAxiosMessage(err) || "Could not reject applicant.",
 			);
 			res.redirect(`/applications/${applicationId}?error=${error}`);
 			return;
 		}
-	}
+	},
 );
 
 router.post(
@@ -363,7 +370,7 @@ router.post(
 			return;
 		} catch (err) {
 			const error = encodeURIComponent(
-				getAxiosMessage(err) || "Could not reject applicant."
+				getAxiosMessage(err) || "Could not reject applicant.",
 			);
 			res.redirect(`/job-roles/${roleId}?error=${error}`);
 			return;
