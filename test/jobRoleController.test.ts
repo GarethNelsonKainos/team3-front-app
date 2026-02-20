@@ -529,11 +529,38 @@ describe("jobRoleController apply routes", () => {
 			status: { statusId: 1, statusName: "open" },
 			numberOfOpenPositions: 2,
 		});
+		vi.mocked(jobRoleService.getJobRoleApplications).mockRejectedValue({
+			response: { status: 403 },
+		});
 		const res = await request(app)
 			.get("/job-roles/1")
 			.set("Cookie", "token=test-jwt-token");
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Apply for this role");
+	});
+
+	it("GET /job-roles/:id should NOT show apply button for admin users", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue({
+			...mockRoleDetail,
+			status: { statusId: 1, statusName: "open" },
+			numberOfOpenPositions: 2,
+		});
+		vi.mocked(jobRoleService.getJobRoleApplications).mockResolvedValue([
+			{
+				applicationId: 101,
+				applicationStatus: "InProgress",
+				email: "candidate@example.com",
+				cvUrl: "https://example-bucket.s3.amazonaws.com/cv.pdf",
+			},
+		]);
+
+		const res = await request(app)
+			.get("/job-roles/1")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Applications for this role");
+		expect(res.text).not.toContain("Apply for this role");
 	});
 
 	it("GET /job-roles/:id should NOT show apply button if closed or no positions", async () => {
