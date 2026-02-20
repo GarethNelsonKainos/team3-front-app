@@ -1,72 +1,12 @@
+
+import type { ApplyForRoleResponse, UploadCvFile } from "../types/applicationService.js";
+import type { JobRoleResponse, JobRoleFilters, JobRoleListResponse } from "../types/jobRole.js";
+import type { JobRoleApplicationResponse } from "../types/jobRoleApplication.js";
+
 import axios from "axios";
 import FormData from "form-data";
 
 const API_TIMEOUT_MS = Number(process.env.API_TIMEOUT_MS ?? 30000);
-
-export interface ApplyForRoleResponse {
-	applicationId: number;
-	userId: number;
-	jobRoleId: number;
-	applicationStatus: string;
-	cvUrl: string;
-}
-
-export interface UploadCvFile {
-	buffer: Buffer;
-	originalname: string;
-	mimetype: string;
-}
-
-export interface JobRoleResponse {
-	jobRoleId: number;
-	roleName: string;
-	location: string;
-	closingDate: string;
-	responsibilities: string;
-	sharepointUrl: string;
-	numberOfOpenPositions: number;
-	capability: {
-		capabilityId: number;
-		capabilityName: string;
-	};
-	band: {
-		bandId: number;
-		bandName: string;
-	};
-	status: {
-		statusId: number;
-		statusName: string;
-	};
-}
-
-export interface JobRoleFilters {
-	roleName?: string;
-	location?: string;
-	closingDate?: string;
-	capability?: string[];
-	band?: string[];
-	orderBy?: string;
-	orderDir?: "asc" | "desc";
-	limit?: number;
-	offset?: number;
-}
-
-export interface JobRoleListResponse {
-	roles: JobRoleResponse[];
-	totalCount?: number;
-}
-
-export interface JobRoleApplicationResponse {
-	applicationId: number;
-	applicationStatus: string;
-	cvUrl?: string;
-	email?: string;
-	username?: string;
-	user?: {
-		email?: string;
-		username?: string;
-	};
-}
 
 const getApiBase = (): string => {
 	const apiBase = process.env.API_BASE_URL || "http://localhost:3001";

@@ -280,30 +280,30 @@ describe("jobRoleController", () => {
 		expect(res.text).not.toContain("Applications for this role");
 	});
 
-	it("POST /job-roles/:id/applications/:applicationId/hire should update and redirect", async () => {
+	it("POST /applications/:applicationId/hire should update and redirect", async () => {
 		vi.mocked(jobRoleService.hireApplication).mockResolvedValue();
 
 		const res = await request(app)
-			.post("/job-roles/1/applications/101/hire")
+			.post("/applications/101/hire")
 			.set("Cookie", "token=test-jwt-token");
 
 		expect(res.status).toBe(302);
-		expect(res.headers.location).toContain("/job-roles/1?success=");
+		expect(res.headers.location).toContain("/applications/101?success=");
 		expect(vi.mocked(jobRoleService.hireApplication)).toHaveBeenCalledWith(
 			"101",
 			"test-jwt-token",
 		);
 	});
 
-	it("POST /job-roles/:id/applications/:applicationId/reject should update and redirect", async () => {
+	it("POST /applications/:applicationId/reject should update and redirect", async () => {
 		vi.mocked(jobRoleService.rejectApplication).mockResolvedValue();
 
 		const res = await request(app)
-			.post("/job-roles/1/applications/101/reject")
+			.post("/applications/101/reject")
 			.set("Cookie", "token=test-jwt-token");
 
 		expect(res.status).toBe(302);
-		expect(res.headers.location).toContain("/job-roles/1?success=");
+		expect(res.headers.location).toContain("/applications/101?success=");
 		expect(vi.mocked(jobRoleService.rejectApplication)).toHaveBeenCalledWith(
 			"101",
 			"test-jwt-token",

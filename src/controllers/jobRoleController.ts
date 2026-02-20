@@ -1,9 +1,11 @@
-import axios, { type AxiosError, isAxiosError } from "axios";
+import { type AxiosError, isAxiosError } from "axios";
 import { type Request, type Response, Router } from "express";
+import type { ApplicationPanelItem } from "../types/application";
 import FormData from "form-data";
 import multer from "multer";
 import jobRoleService from "../services/jobRoleService.js";
 import { uploadCV } from "../services/uploadService.js";
+import { getCvDownloadUrl } from "../services/applicationService.js";
 import upload from "../utils/upload.js";
 
 interface ErrorWithResponse {
@@ -23,35 +25,17 @@ router.get("/api/applications/cv", async (req: Request, res: Response) => {
 	const applicationId = req.query.applicationId;
 	const token = req.cookies?.token as string | undefined;
 	if (!applicationId || typeof applicationId !== "string") {
-		return res.status(400).send("Missing or invalid applicationId parameter");
+		return res.render("error.html", { message: "Missing or invalid applicationId parameter" });
 	}
 	if (!token) {
-		return res.status(401).send("Not authenticated");
+		return res.render("error.html", { message: "Not authenticated" });
 	}
 	try {
-		// Call backend API to get the presigned URL or redirect
-		const backendUrl = `${process.env.API_BASE_URL || "http://localhost:3001"}/api/applications/cv?applicationId=${encodeURIComponent(applicationId)}`;
-		// Use axios to follow up to 0 redirects so we can capture the Location header
-		const response = await axios.get(backendUrl, {
-			headers: { Authorization: `Bearer ${token}` },
-			maxRedirects: 0,
-			validateStatus: (status: number) => status === 302,
-		});
-		const location = response.headers["location"];
-		if (location) {
-			// Redirect the browser to the presigned S3 URL
-			return res.redirect(location);
-		} else {
-			return res.status(500).send("Failed to get CV download URL");
-		}
-	} catch (err: unknown) {
-		if (isAxiosError(err) && err.response?.status === 302) {
-			const location = err.response.headers["location"];
-			if (location) {
-				return res.redirect(location);
-			}
-		}
-		return res.status(500).send("Failed to get CV download URL");
+		const location = await getCvDownloadUrl(applicationId, token);
+		return res.redirect(location);
+	} catch (err) {
+		console.error("Failed to get CV download URL", err);
+		return res.render("error.html", { message: "Failed to get CV download URL" });
 	}
 });
 
@@ -263,42 +247,17 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 
 		const applicationsPanel = {
 			visible: false,
-			items: [] as Array<{
-				applicationId: number;
-				applicationStatus: string;
-				applicantName: string;
-				cvUrl?: string;
-				canAssess: boolean;
-			}>,
+			items: [] as ApplicationPanelItem[],
 			success: successMessage,
 			error: errorMessage,
 		};
 
 		if (role && token) {
 			try {
-				const applications = await jobRoleService.getJobRoleApplications(
-					id,
-					token,
-				);
+				const applications = await jobRoleService.getJobRoleApplications(id, token);
 				applicationsPanel.visible = true;
-				applicationsPanel.items = applications.map((application) => {
-					const applicantName =
-						application.email ||
-						application.username ||
-						application.user?.email ||
-						application.user?.username ||
-						"Unknown applicant";
-					const statusLabel = application.applicationStatus || "Unknown";
-					return {
-						applicationId: application.applicationId,
-						applicationStatus: statusLabel,
-						applicantName,
-						cvUrl: application.cvUrl,
-						canAssess:
-							statusLabel.toLowerCase() === "inprogress" ||
-							statusLabel.toLowerCase() === "in progress",
-					};
-				});
+				const { mapApplicationsToPanelItems } = await import("../mappers/applicationPanelItemMapper.js");
+				applicationsPanel.items = mapApplicationsToPanelItems(applications);
 			} catch (err) {
 				const status = getAxiosStatus(err);
 				if (status !== 401 && status !== 403) {
@@ -333,10 +292,10 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 	}
 });
 
+
 router.post(
-	"/job-roles/:id/applications/:applicationId/hire",
+	"/applications/:applicationId/hire",
 	async (req: Request, res: Response) => {
-		const roleId = String(req.params.id);
 		const applicationId = String(req.params.applicationId);
 		const token = req.cookies?.token as string | undefined;
 		if (!token) {
@@ -347,16 +306,43 @@ router.post(
 		try {
 			await jobRoleService.hireApplication(applicationId, token);
 			const success = encodeURIComponent("Application marked as Hired.");
-			res.redirect(`/job-roles/${roleId}?success=${success}`);
+			// Optionally, you may want to redirect to a job role page if you can get the jobRoleId from the application
+			res.redirect(`/applications/${applicationId}?success=${success}`);
 			return;
 		} catch (err) {
 			const error = encodeURIComponent(
-				getAxiosMessage(err) || "Could not hire applicant.",
+				getAxiosMessage(err) || "Could not hire applicant."
 			);
-			res.redirect(`/job-roles/${roleId}?error=${error}`);
+			res.redirect(`/applications/${applicationId}?error=${error}`);
 			return;
 		}
-	},
+	}
+);
+
+
+router.post(
+	"/applications/:applicationId/reject",
+	async (req: Request, res: Response) => {
+		const applicationId = String(req.params.applicationId);
+		const token = req.cookies?.token as string | undefined;
+		if (!token) {
+			res.redirect("/login");
+			return;
+		}
+
+		try {
+			await jobRoleService.rejectApplication(applicationId, token);
+			const success = encodeURIComponent("Application marked as Rejected.");
+			res.redirect(`/applications/${applicationId}?success=${success}`);
+			return;
+		} catch (err) {
+			const error = encodeURIComponent(
+				getAxiosMessage(err) || "Could not reject applicant."
+			);
+			res.redirect(`/applications/${applicationId}?error=${error}`);
+			return;
+		}
+	}
 );
 
 router.post(
@@ -377,7 +363,7 @@ router.post(
 			return;
 		} catch (err) {
 			const error = encodeURIComponent(
-				getAxiosMessage(err) || "Could not reject applicant.",
+				getAxiosMessage(err) || "Could not reject applicant."
 			);
 			res.redirect(`/job-roles/${roleId}?error=${error}`);
 			return;
