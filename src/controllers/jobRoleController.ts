@@ -1,7 +1,12 @@
+import { type AxiosError, isAxiosError } from "axios";
 import { type Request, type Response, Router } from "express";
 import FormData from "form-data";
+import multer from "multer";
+import { mapApplicationsToPanelItems } from "../mappers/applicationPanelItemMapper.js";
+import { getCvDownloadUrl } from "../services/applicationService.js";
 import jobRoleService from "../services/jobRoleService.js";
 import { uploadCV } from "../services/uploadService.js";
+import type { ApplicationPanelItem } from "../types/application";
 import upload from "../utils/upload.js";
 
 interface ErrorWithResponse {
@@ -13,6 +18,33 @@ interface ErrorWithResponse {
 	};
 }
 
+// ...existing code...
+const router = Router();
+
+// Proxy route for CV download (admin only)
+router.get("/api/applications/cv", async (req: Request, res: Response) => {
+	const applicationId = req.query.applicationId;
+	const token = req.cookies?.token as string | undefined;
+	if (!applicationId || typeof applicationId !== "string") {
+		return res.render("error.html", {
+			message: "Missing or invalid applicationId parameter",
+		});
+	}
+	if (!token) {
+		return res.render("error.html", { message: "Not authenticated" });
+	}
+	try {
+		const location = await getCvDownloadUrl(applicationId, token);
+		return res.redirect(location);
+	} catch (err) {
+		console.error("Failed to get CV download URL", err);
+		return res.render("error.html", {
+			message: "Failed to get CV download URL",
+		});
+	}
+});
+
+// Helper functions for query param parsing
 function getString(value: unknown): string | undefined {
 	return typeof value === "string" && value.trim().length > 0
 		? value.trim()
@@ -33,7 +65,21 @@ function getStringArray(value: unknown): string[] {
 const showRoleFilteringUI = process.env.FEATURE_ROLE_FILTERING === "true";
 const DEFAULT_PAGE_SIZE = 10;
 
-const router = Router();
+const getAxiosStatus = (err: unknown): number | undefined => {
+	const axiosErr = err as { response?: { status?: number } };
+	return axiosErr.response?.status;
+};
+
+const getAxiosMessage = (err: unknown): string | undefined => {
+	const axiosErr = err as { response?: { data?: { message?: string } } };
+	return axiosErr.response?.data?.message;
+};
+
+// ...existing code...
+const uploadCv = multer({
+	storage: multer.memoryStorage(),
+	limits: { fileSize: 10 * 1024 * 1024 },
+});
 
 router.get("/job-roles", async (req: Request, res: Response) => {
 	try {
@@ -201,19 +247,108 @@ router.get("/job-roles/:id", async (req: Request, res: Response) => {
 		const id = String(req.params.id);
 		const token = req.cookies?.token as string | undefined;
 		const role = await jobRoleService.getJobRoleById(id, token);
+		const successMessage = getString(req.query.success);
+		const errorMessage = getString(req.query.error);
+
+		const applicationsPanel = {
+			visible: false,
+			items: [] as ApplicationPanelItem[],
+			success: successMessage,
+			error: errorMessage,
+		};
+
+		if (role && token) {
+			try {
+				const applications = await jobRoleService.getJobRoleApplications(
+					id,
+					token,
+				);
+				applicationsPanel.visible = true;
+				applicationsPanel.items = mapApplicationsToPanelItems(applications);
+			} catch (err) {
+				const status = getAxiosStatus(err);
+				if (status !== 401 && status !== 403) {
+					applicationsPanel.visible = true;
+					applicationsPanel.error =
+						getAxiosMessage(err) || "Failed to load applications.";
+				}
+			}
+		}
+
 		let canApply = false;
 		if (role && (role.numberOfOpenPositions ?? 0) > 0) {
 			canApply = true;
 		}
-		res.render("job-role-information.html", { role, canApply });
+		res.render("job-role-information.html", {
+			role,
+			canApply,
+			applicationsPanel,
+		});
 	} catch (err) {
 		console.error("Failed to load job role", err);
 		res.render("job-role-information.html", {
 			role: undefined,
 			canApply: false,
+			applicationsPanel: {
+				visible: false,
+				items: [],
+				success: undefined,
+				error: undefined,
+			},
 		});
 	}
 });
+
+router.post(
+	"/applications/:applicationId/hire",
+	async (req: Request, res: Response) => {
+		const applicationId = String(req.params.applicationId);
+		const token = req.cookies?.token as string | undefined;
+		if (!token) {
+			res.redirect("/login");
+			return;
+		}
+
+		try {
+			await jobRoleService.hireApplication(applicationId, token);
+			const success = encodeURIComponent("Application marked as Hired.");
+			// Optionally, you may want to redirect to a job role page if you can get the jobRoleId from the application
+			res.redirect(`/applications/${applicationId}?success=${success}`);
+			return;
+		} catch (err) {
+			const error = encodeURIComponent(
+				getAxiosMessage(err) || "Could not hire applicant.",
+			);
+			res.redirect(`/applications/${applicationId}?error=${error}`);
+			return;
+		}
+	},
+);
+
+router.post(
+	"/applications/:applicationId/reject",
+	async (req: Request, res: Response) => {
+		const applicationId = String(req.params.applicationId);
+		const token = req.cookies?.token as string | undefined;
+		if (!token) {
+			res.redirect("/login");
+			return;
+		}
+
+		try {
+			await jobRoleService.rejectApplication(applicationId, token);
+			const success = encodeURIComponent("Application marked as Rejected.");
+			res.redirect(`/applications/${applicationId}?success=${success}`);
+			return;
+		} catch (err) {
+			const error = encodeURIComponent(
+				getAxiosMessage(err) || "Could not reject applicant.",
+			);
+			res.redirect(`/applications/${applicationId}?error=${error}`);
+			return;
+		}
+	},
+);
 
 // GET apply form
 router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
@@ -221,10 +356,18 @@ router.get("/job-roles/:id/apply", async (req: Request, res: Response) => {
 		const id = String(req.params.id);
 		const token = req.cookies?.token as string | undefined;
 		const role = await jobRoleService.getJobRoleById(id, token);
-		res.render("job-role-apply.html", { role, submitted: false });
+		res.render("job-role-apply.html", {
+			role,
+			submitted: false,
+			applyError: undefined,
+		});
 	} catch (err) {
 		console.error("Failed to load apply form", err);
-		res.render("job-role-apply.html", { role: undefined, submitted: false });
+		res.render("job-role-apply.html", {
+			role: undefined,
+			submitted: false,
+			applyError: undefined,
+		});
 	}
 });
 
@@ -241,7 +384,7 @@ router.post(
 					res.render("job-role-apply.html", {
 						role,
 						submitted: false,
-						error: err.message,
+						applyError: err.message,
 					});
 				})();
 			} else {
@@ -262,7 +405,7 @@ router.post(
 				return res.render("job-role-apply.html", {
 					role,
 					submitted: false,
-					error: "No file uploaded.",
+					applyError: "Please upload your CV as a PDF file.",
 				});
 			}
 
@@ -277,23 +420,20 @@ router.post(
 			res.render("job-role-apply.html", { role, submitted: true });
 		} catch (err) {
 			console.error("Failed to submit application", err);
-			const message =
-				(err as ErrorWithResponse).response?.data?.message ??
-				"Error submitting application. Please try again.";
-			const status = (err as ErrorWithResponse).response?.status;
-			if (status !== undefined && status >= 400 && status < 500) {
-				res.render("job-role-apply.html", {
-					role,
-					submitted: false,
-					error: message,
-				});
+			const errorResponse = (err as ErrorWithResponse).response;
+			let message: string;
+			if (errorResponse?.status === 400) {
+				message =
+					errorResponse.data?.message ||
+					"Error submitting application. Please try again.";
 			} else {
-				res.render("job-role-apply.html", {
-					role,
-					submitted: false,
-					error: "An unexpected error occurred. Please try again.",
-				});
+				message = "An unexpected error occurred. Please try again.";
 			}
+			res.render("job-role-apply.html", {
+				role,
+				submitted: false,
+				applyError: message,
+			});
 		}
 	},
 );

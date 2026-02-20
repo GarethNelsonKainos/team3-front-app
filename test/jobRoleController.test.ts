@@ -72,6 +72,9 @@ app.use("/", jobRoleController);
 describe("jobRoleController", () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
+		vi.mocked(jobRoleService.getJobRoleApplications).mockResolvedValue([]);
+		vi.mocked(jobRoleService.hireApplication).mockResolvedValue();
+		vi.mocked(jobRoleService.rejectApplication).mockResolvedValue();
 	});
 
 	it("GET /job-roles should render job roles list", async () => {
@@ -224,6 +227,7 @@ describe("jobRoleController", () => {
 
 	it("GET /job-roles/:id should render job role detail", async () => {
 		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(jobRoleService.getJobRoleApplications).mockResolvedValue([]);
 		const res = await request(app)
 			.get("/job-roles/1")
 			.set("Cookie", "token=test-jwt-token");
@@ -233,6 +237,75 @@ describe("jobRoleController", () => {
 		expect(res.text).toContain("Ship features");
 		expect(vi.mocked(jobRoleService.getJobRoleById)).toHaveBeenCalledWith(
 			"1",
+			"test-jwt-token",
+		);
+		expect(
+			vi.mocked(jobRoleService.getJobRoleApplications),
+		).toHaveBeenCalledWith("1", "test-jwt-token");
+	});
+
+	it("GET /job-roles/:id should render applications list for admins", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(jobRoleService.getJobRoleApplications).mockResolvedValue([
+			{
+				applicationId: 101,
+				applicationStatus: "InProgress",
+				email: "candidate@example.com",
+				cvUrl: "https://example-bucket.s3.amazonaws.com/cv.pdf",
+			},
+		]);
+
+		const res = await request(app)
+			.get("/job-roles/1")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Applications for this role");
+		expect(res.text).toContain("candidate@example.com");
+		expect(res.text).toContain("Hire");
+		expect(res.text).toContain("Reject");
+	});
+
+	it("GET /job-roles/:id should hide applications list for non-admin users", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		vi.mocked(jobRoleService.getJobRoleApplications).mockRejectedValue({
+			response: { status: 403 },
+		});
+
+		const res = await request(app)
+			.get("/job-roles/1")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(200);
+		expect(res.text).not.toContain("Applications for this role");
+	});
+
+	it("POST /applications/:applicationId/hire should update and redirect", async () => {
+		vi.mocked(jobRoleService.hireApplication).mockResolvedValue();
+
+		const res = await request(app)
+			.post("/applications/101/hire")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(302);
+		expect(res.headers.location).toContain("/applications/101?success=");
+		expect(vi.mocked(jobRoleService.hireApplication)).toHaveBeenCalledWith(
+			"101",
+			"test-jwt-token",
+		);
+	});
+
+	it("POST /applications/:applicationId/reject should update and redirect", async () => {
+		vi.mocked(jobRoleService.rejectApplication).mockResolvedValue();
+
+		const res = await request(app)
+			.post("/applications/101/reject")
+			.set("Cookie", "token=test-jwt-token");
+
+		expect(res.status).toBe(302);
+		expect(res.headers.location).toContain("/applications/101?success=");
+		expect(vi.mocked(jobRoleService.rejectApplication)).toHaveBeenCalledWith(
+			"101",
 			"test-jwt-token",
 		);
 	});
@@ -250,7 +323,13 @@ describe("jobRoleController", () => {
 describe("jobRoleController apply routes", () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
-		vi.mocked(axios.post).mockResolvedValue({} as any);
+		vi.mocked(jobRoleService.applyForJobRole).mockResolvedValue({
+			applicationId: 1,
+			userId: 2,
+			jobRoleId: 1,
+			applicationStatus: "InProgress",
+			cvUrl: "applications/cv.pdf",
+		});
 	});
 
 	it("GET /job-roles/:id/apply should render apply form if role exists", async () => {
@@ -426,10 +505,22 @@ describe("jobRoleController apply routes", () => {
 		const res = await request(app)
 			.post("/job-roles/999/apply")
 			.set("Cookie", "token=test-jwt-token")
-			.type("form")
-			.send({ cv: "fakefile.pdf" });
+			.attach("cv", Buffer.from("fake-pdf-content"), {
+				filename: "fakefile.pdf",
+				contentType: "application/pdf",
+			});
 		expect(res.status).toBe(200);
 		expect(res.text).toContain("Job role not found");
+	});
+
+	it("POST /job-roles/:id/apply should show validation error when cv is missing", async () => {
+		vi.mocked(jobRoleService.getJobRoleById).mockResolvedValue(mockRoleDetail);
+		const res = await request(app)
+			.post("/job-roles/1/apply")
+			.set("Cookie", "token=test-jwt-token");
+		expect(res.status).toBe(200);
+		expect(res.text).toContain("Please upload your CV as a PDF file.");
+		expect(vi.mocked(jobRoleService.applyForJobRole)).not.toHaveBeenCalled();
 	});
 
 	it("GET /job-roles/:id should show apply button if open and positions > 0", async () => {

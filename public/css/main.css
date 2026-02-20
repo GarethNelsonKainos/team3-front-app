@@ -50,6 +50,27 @@
 	gap: 16px;
 	margin-bottom: 24px;
 }
+.applications-card {
+	margin-top: 24px;
+}
+.application-feedback {
+	margin: 8px 0 16px;
+	font-weight: 600;
+}
+.application-feedback.success {
+	color: #267d2e;
+}
+.application-feedback.error {
+	color: #b00020;
+}
+.application-actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+.application-action-form {
+	margin: 0;
+}
 h1,
 h2,
 h3,

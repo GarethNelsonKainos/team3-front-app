@@ -44,6 +44,65 @@
         <p><a href="/job-roles/{{ role.jobRoleId }}/apply">Apply for this role</a></p>
         {% endif %}
 
+        {% if applicationsPanel.visible %}
+        <div class="page-card applications-card">
+          <h2>Applications for this role</h2>
+
+          {% if applicationsPanel.success %}
+          <p class="application-feedback success">{{ applicationsPanel.success }}</p>
+          {% endif %}
+          {% if applicationsPanel.error %}
+          <p class="application-feedback error">{{ applicationsPanel.error }}</p>
+          {% endif %}
+
+          {% if applicationsPanel.items and applicationsPanel.items.length > 0 %}
+          <table class="job-roles-table">
+            <caption>Applicants for this job role</caption>
+            <thead>
+              <tr>
+                <th scope="col">Applicant</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for application in applicationsPanel.items %}
+              <tr>
+                <td>
+                  {% if application.cvUrl %}
+                  <a class="table-link" href="/api/applications/cv?applicationId={{ application.applicationId }}" target="_blank" rel="noopener noreferrer">
+                    {{ application.applicantName }}
+                  </a>
+
+                  {% else %}
+                    {{ application.applicantName }}
+                  {% endif %}
+                </td>
+                <td>{{ application.applicationStatus }}</td>
+                <td>
+                  {% if application.canAssess %}
+                  <div class="application-actions">
+                    <form action="/job-roles/{{ role.jobRoleId }}/applications/{{ application.applicationId }}/hire" method="post" class="application-action-form" onsubmit="return confirm('Hire this applicant?');">
+                      <button type="submit" class="link-button">Hire</button>
+                    </form>
+                    <form action="/job-roles/{{ role.jobRoleId }}/applications/{{ application.applicationId }}/reject" method="post" class="application-action-form" onsubmit="return confirm('Reject this applicant?');">
+                      <button type="submit" class="link-button">Reject</button>
+                    </form>
+                  </div>
+                  {% else %}
+                    <span>—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No applications found for this role.</p>
+          {% endif %}
+        </div>
+        {% endif %}
+
         <p><a href="/job-roles">Back to job roles</a></p>
       {% else %}
         <div class="page-card">

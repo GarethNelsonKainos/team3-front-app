@@ -1,43 +1,17 @@
 import axios from "axios";
+import FormData from "form-data";
+import type {
+	ApplyForRoleResponse,
+	UploadCvFile,
+} from "../types/applicationService.js";
+import type {
+	JobRoleFilters,
+	JobRoleListResponse,
+	JobRoleResponse,
+} from "../types/jobRole.js";
+import type { JobRoleApplicationResponse } from "../types/jobRoleApplication.js";
 
-export interface JobRoleResponse {
-	jobRoleId: number;
-	roleName: string;
-	location: string;
-	closingDate: string;
-	responsibilities: string;
-	sharepointUrl: string;
-	numberOfOpenPositions: number;
-	capability: {
-		capabilityId: number;
-		capabilityName: string;
-	};
-	band: {
-		bandId: number;
-		bandName: string;
-	};
-	status: {
-		statusId: number;
-		statusName: string;
-	};
-}
-
-export interface JobRoleFilters {
-	roleName?: string;
-	location?: string;
-	closingDate?: string;
-	capability?: string[];
-	band?: string[];
-	orderBy?: string;
-	orderDir?: "asc" | "desc";
-	limit?: number;
-	offset?: number;
-}
-
-export interface JobRoleListResponse {
-	roles: JobRoleResponse[];
-	totalCount?: number;
-}
+const API_TIMEOUT_MS = Number(process.env.API_TIMEOUT_MS ?? 30000);
 
 const getApiBase = (): string => {
 	const apiBase = process.env.API_BASE_URL || "http://localhost:3001";
@@ -73,7 +47,11 @@ export async function getOpenJobRoles(
 	if (filters.limit !== undefined) params.set("limit", String(filters.limit));
 	if (filters.offset !== undefined)
 		params.set("offset", String(filters.offset));
-	const resp = await axios.get<JobRoleResponse[]>(url, { params, headers });
+	const resp = await axios.get<JobRoleResponse[]>(url, {
+		params,
+		headers,
+		timeout: API_TIMEOUT_MS,
+	});
 	const totalHeader = resp.headers?.["x-total-count"];
 	const totalCount = totalHeader ? Number.parseInt(totalHeader, 10) : undefined;
 	return {
@@ -92,6 +70,7 @@ export async function getJobRoleById(
 		const resp = await axios.get<JobRoleResponse>(url, {
 			headers,
 			withCredentials: true,
+			timeout: API_TIMEOUT_MS,
 		});
 		return resp.data;
 	} catch (err: unknown) {
@@ -103,4 +82,65 @@ export async function getJobRoleById(
 	}
 }
 
-export default { getOpenJobRoles, getJobRoleById };
+export async function getJobRoleApplications(
+	jobRoleId: number | string,
+	token?: string,
+): Promise<JobRoleApplicationResponse[]> {
+	const url = `${getApiBase()}/api/job-roles/${jobRoleId}/applications`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+	const resp = await axios.get<JobRoleApplicationResponse[]>(url, {
+		headers,
+		timeout: API_TIMEOUT_MS,
+	});
+	return resp.data || [];
+}
+
+export async function hireApplication(
+	applicationId: number | string,
+	token?: string,
+): Promise<void> {
+	const url = `${getApiBase()}/api/applications/${applicationId}/hire`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+	await axios.put(url, undefined, { headers, timeout: API_TIMEOUT_MS });
+}
+
+export async function rejectApplication(
+	applicationId: number | string,
+	token?: string,
+): Promise<void> {
+	const url = `${getApiBase()}/api/applications/${applicationId}/reject`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+	await axios.put(url, undefined, { headers, timeout: API_TIMEOUT_MS });
+}
+
+export async function applyForJobRole(
+	jobRoleId: number | string,
+	cvFile: UploadCvFile,
+	token?: string,
+): Promise<ApplyForRoleResponse> {
+	const url = `${getApiBase()}/api/job-roles/${jobRoleId}/apply`;
+	const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+	const formData = new FormData();
+	formData.append("cv", cvFile.buffer, {
+		filename: cvFile.originalname,
+		contentType: cvFile.mimetype,
+		knownLength: cvFile.buffer.length,
+	});
+	const formHeaders = formData.getHeaders();
+	const combinedHeaders = { ...(headers ?? {}), ...formHeaders };
+	const resp = await axios.post<ApplyForRoleResponse>(url, formData, {
+		headers: combinedHeaders,
+		timeout: API_TIMEOUT_MS,
+		maxBodyLength: Number.POSITIVE_INFINITY,
+	});
+	return resp.data;
+}
+
+export default {
+	getOpenJobRoles,
+	getJobRoleById,
+	getJobRoleApplications,
+	hireApplication,
+	rejectApplication,
+	applyForJobRole,
+};

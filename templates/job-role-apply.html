@@ -28,14 +28,14 @@
             <p><b>Status:</b> <span class="status-pill">In progress</span></p>
             <p><a class="text-link" href="/job-roles/{{ role.jobRoleId }}">Back to role</a></p>
           {% else %}
-            {% if error %}
-              <p class="status-banner" style="background: rgba(220,53,69,0.12); border-color: rgba(220,53,69,0.4); color: #721c24; margin-bottom: 16px;">{{ error }}</p>
+            {% if applyError %}
+              <p class="application-feedback error">{{ applyError }}</p>
             {% endif %}
             <form class="apply-form" method="post" enctype="multipart/form-data">
               <div class="form-field">
                 <label for="cv">Upload CV</label>
-                <input id="cv" name="cv" type="file" accept=".pdf,.doc,.docx" required />
-                <p class="form-hint">Accepted formats: PDF, DOC, DOCX. Max 10MB.</p>
+                <input id="cv" name="cv" type="file" accept=".pdf" required />
+                <p class="form-hint">Accepted format: PDF. Max 10MB.</p>
               </div>
               <button class="cta-button" type="submit">Submit application</button>
             </form>
