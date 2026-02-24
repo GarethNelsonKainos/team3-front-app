@@ -48,19 +48,44 @@ npm test
 Run tests with coverage report:
 
 ```bash
-npm run coverage
+## Testing
+
+### Playwright UI/E2E Testing Framework
+
+All Playwright-related files are now centralized in the `playwright/` folder:
+
+```
+playwright/
+	config.ts                # Playwright configuration
+	tests/                   # All Playwright .spec.ts files
+	helpers/                 # Playwright helpers/utilities
+	report/                  # Playwright HTML reports
 ```
 
-## Linting & Formatting
+#### Running Playwright Tests
 
-This project uses [Biome](https://biomejs.dev/) for linting and formatting.
-
-Check code quality (lint + format):
+To run Playwright tests locally:
 
 ```bash
-npm run check
+npx playwright test --config playwright/config.ts
 ```
 
+Test reports will be generated in `playwright/report/`.
+
+#### Adding New Tests
+
+Add new `.spec.ts` files to `playwright/tests/`.
+
+#### Using Helpers
+
+Place reusable utilities in `playwright/helpers/` and import as needed in your tests.
+
+#### Configuration
+
+Edit `playwright/config.ts` to update test settings, browser projects, or baseURL.
+
+---
+Other test frameworks (e.g., unit tests) remain in their original locations.
 Lint code:
 
 ```bash
