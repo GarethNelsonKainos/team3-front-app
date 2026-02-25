@@ -49,6 +49,8 @@ test.describe('Applicant Multiple Roles Navigation', () => {
         await roleDetail.waitForLoaded();
       } else {
         console.log(`Apply button not visible for role ${i + 1} (may be admin user or closed role)`);
+        await roleDetail.backToJobRoles();
+        continue;
       }
 
       await roleDetail.backToJobRoles();
