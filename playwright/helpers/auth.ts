@@ -5,13 +5,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const ADMIN_CREDENTIALS = {
-  email: process.env.TEST_ADMIN_CREDENTIALS ? JSON.parse(process.env.TEST_ADMIN_CREDENTIALS).email : 'test.admin@example.com',
-  password: process.env.TEST_ADMIN_CREDENTIALS ? JSON.parse(process.env.TEST_ADMIN_CREDENTIALS).password : 'Test123!',
+  email: process.env.TEST_ADMIN_CREDENTIALS ? JSON.parse(process.env.TEST_ADMIN_CREDENTIALS).email : '',
+  password: process.env.TEST_ADMIN_CREDENTIALS ? JSON.parse(process.env.TEST_ADMIN_CREDENTIALS).password : '',
 };
 
 export const APPLICANT_CREDENTIALS = {
-  email: process.env.TEST_CREDENTIALS ? JSON.parse(process.env.TEST_CREDENTIALS).email : 'tom@kainos.com',
-  password: process.env.TEST_CREDENTIALS ? JSON.parse(process.env.TEST_CREDENTIALS).password : 'Password123!',
+  email: process.env.TEST_CREDENTIALS ? JSON.parse(process.env.TEST_CREDENTIALS).email : '',
+  password: process.env.TEST_CREDENTIALS ? JSON.parse(process.env.TEST_CREDENTIALS).password : '',
 };
 
 export async function login(page: Page, email: string, password: string) {
