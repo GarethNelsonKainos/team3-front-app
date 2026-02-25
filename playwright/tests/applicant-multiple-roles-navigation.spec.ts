@@ -64,19 +64,32 @@ test.describe('Applicant Multiple Roles Navigation', () => {
     }
 
     console.log('\nVerifying breadcrumb trail...');
-    await roleDetail.gotoUrl(roleUrls[0]);
-    await roleDetail.waitForLoaded();
 
-    if (await roleDetail.hasApplyLink()) {
-      await roleDetail.goToApply();
-      await apply.waitForLoaded();
-
-      await apply.backToRole();
-      await roleDetail.waitForUrl(roleUrls[0]);
-
-      await roleDetail.backToJobRoles();
-
-      console.log('✓ Breadcrumb trail (apply → detail → list) works correctly');
+    let foundLink = false;
+    for (let i = 0; i < roleUrls.length; i++) {
+      await roleDetail.gotoUrl(roleUrls[i]);
+      await roleDetail.waitForLoaded();
+  
+      if (await roleDetail.hasApplyLink()) {
+        await roleDetail.goToApply();
+        await apply.waitForLoaded();
+  
+        await apply.backToRole();
+        await roleDetail.waitForUrl(roleUrls[i]);
+  
+        await roleDetail.backToJobRoles();
+  
+        console.log('✓ Breadcrumb trail (apply → detail → list) works correctly');
+        foundLink = true;
+        break;
+      } else {
+        console.log(`Apply button not visible for role ${i + 1}, skipping first breadcrumb test`);
+        await roleDetail.backToJobRoles();
+      }
+    }
+    
+    if (!foundLink) {
+      throw new Error(`No apply link found for any role, unable to verify breadcrumb trail`);
     }
   });
 });
