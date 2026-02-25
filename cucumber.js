@@ -1,7 +1,7 @@
 export default {
   default: {
-    paths: ['features/**/*.feature'],
-    import: ['features/**/*.ts'],
+    paths: ['playwright/features/**/*.feature'],
+    import: ['playwright/step-definitions/**/*.ts', 'playwright/support/**/*.ts'],
     format: ['progress'],
     publishQuiet: true
   }
