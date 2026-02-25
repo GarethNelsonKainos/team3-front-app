@@ -36,27 +36,26 @@ router.post("/register", async (req: Request, res: Response) => {
 		let message = "An error occurred during registration";
 		let statusCode = 500;
 
-		switch (true) {
-			case err instanceof ValidationError:
-				message = err.message;
-				statusCode = 400;
-				break;
-			case err instanceof ConflictError:
-				message = err.message;
-				statusCode = 409;
-				break;
-			case err &&
-				typeof err === "object" &&
-				"response" in err &&
-				(err as { response?: { data?: { message?: string } } }).response?.data
-					?.message:
-				message =
-					(err as { response?: { data?: { message?: string } } }).response?.data
-						?.message ?? "An error occurred during registration";
-				break;
-			case err instanceof Error:
-				message = err.message;
-				break;
+		if (err instanceof ValidationError) {
+			message = err.message;
+			statusCode = 400;
+		} else if (err instanceof ConflictError) {
+			message = err.message;
+			statusCode = 409;
+		} else if (err && typeof err === "object" && "response" in err) {
+			const axiosError = err as {
+				response?: {
+					status?: number;
+					data?: { message?: string };
+				};
+			};
+
+			statusCode = axiosError.response?.status ?? 500;
+			message =
+				axiosError.response?.data?.message ??
+				"An error occurred during registration";
+		} else if (err instanceof Error) {
+			message = err.message;
 		}
 
 		res.status(statusCode).render("register.html", {
