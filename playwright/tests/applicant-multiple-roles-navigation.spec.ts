@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { JobRolesPage } from '../pages/JobRolesPage';
 import { JobRoleDetailPage } from '../pages/JobRoleDetailPage';
@@ -87,9 +87,7 @@ test.describe('Applicant Multiple Roles Navigation', () => {
         await roleDetail.backToJobRoles();
       }
     }
-    
-    if (!foundLink) {
-      throw new Error(`No apply link found for any role, unable to verify breadcrumb trail`);
-    }
+
+    expect(foundLink).toBe(true);
   });
 });
