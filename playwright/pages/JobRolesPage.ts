@@ -1,5 +1,5 @@
 import { type Locator, type Page } from '@playwright/test';
-import { buildUrl, ROUTES, URL_PATTERNS } from './appUrls';
+import { buildUrl, ROUTES, URL_PATTERNS } from '../helpers/appUrls';
 
 export interface RoleRowData {
   name: string;

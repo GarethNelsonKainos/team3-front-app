@@ -1,5 +1,5 @@
 import { type Locator, type Page } from '@playwright/test';
-import { URL_PATTERNS } from './appUrls';
+import { URL_PATTERNS } from '../helpers/appUrls';
 
 export class ApplyPage {
   private static readonly DEFAULT_CV_PATH = 'playwright/data/cv-template.pdf';

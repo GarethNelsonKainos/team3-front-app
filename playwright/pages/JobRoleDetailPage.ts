@@ -4,19 +4,23 @@ import {
   buildJobRoleApplyPath,
   buildUrl,
   URL_PATTERNS,
-} from './appUrls';
+} from '../helpers/appUrls';
 
 export class JobRoleDetailPage {
   private readonly page: Page;
   private readonly roleHeading: Locator;
   private readonly applyLink: Locator;
   private readonly backToJobRolesLink: Locator;
+  private readonly detailRows: Locator;
+  private readonly detailLabelBolds: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.roleHeading = this.page.locator('h1').first();
     this.applyLink = this.page.getByRole('link', { name: /Apply for this role/i });
     this.backToJobRolesLink = this.page.getByRole('link', { name: /Back to job roles/i });
+    this.detailRows = this.page.locator('p');
+    this.detailLabelBolds = this.page.locator('b');
   }
 
   async waitForLoaded() {
@@ -29,8 +33,8 @@ export class JobRoleDetailPage {
   }
 
   async getDetailValue(label: string): Promise<string> {
-    const row = this.page.locator('p', {
-      has: this.page.locator('b', { hasText: `${label}:` }),
+    const row = this.detailRows.filter({
+      has: this.detailLabelBolds.filter({ hasText: `${label}:` }),
     }).first();
     const text = (await row.textContent())?.trim() ?? '';
     return text.replace(new RegExp(`^${label}:\\s*`), '').trim();
