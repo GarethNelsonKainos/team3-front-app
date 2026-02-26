@@ -18,7 +18,20 @@ export class ApplicationsPanel {
   }
 
   async waitForVisible() {
-    await this.heading.waitFor({ state: 'visible' });
+    // Poll for up to 10s for any of the indicators to appear: heading, table, or no-applications message.
+    const timeout = 10000;
+    const interval = 250;
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      if (await this.heading.isVisible()) return;
+      if (await this.applicationsTable.isVisible()) return;
+      if (await this.noApplicationsMessage.isVisible()) return;
+      // small delay
+      // eslint-disable-next-line no-await-in-loop
+      await this.page.waitForTimeout(interval);
+    }
+    // final attempt: none of the expected elements appeared — throw a clear error
+    throw new Error('Applications panel did not render: no heading, table, or no-applications message');
   }
 
   async getRowCount(): Promise<number> {

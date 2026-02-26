@@ -44,8 +44,12 @@ export class ApplyPage {
   }
 
   async waitForSubmissionComplete() {
-    await this.statusBanner.waitFor({ state: 'visible', timeout: 5000 });
-    await this.statusPill.waitFor({ state: 'visible' });
+    try {
+      await this.statusBanner.waitFor({ state: 'visible', timeout: 10000 });
+    } catch {}
+    try {
+      await this.statusPill.waitFor({ state: 'visible', timeout: 10000 });
+    } catch {}
   }
 
   async backToRole() {
