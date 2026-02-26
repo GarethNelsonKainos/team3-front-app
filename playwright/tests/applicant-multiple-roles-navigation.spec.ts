@@ -14,6 +14,7 @@ test.describe('Applicant Multiple Roles Navigation', () => {
 
     await login.goto();
     await login.login(APPLICANT_CREDENTIALS.email, APPLICANT_CREDENTIALS.password);
+    await login.clickLoginButton();
     await roles.waitForLoaded();
 
     const totalLinks = await roles.getViewLinksCount();

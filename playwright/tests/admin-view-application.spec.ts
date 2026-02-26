@@ -19,6 +19,7 @@ test('admin can view a users application', async ({ page }) => {
     await home.waitForLoaded();
     await login.goto();
     await login.login(ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password);
+    await login.clickLoginButton();
     await nav.waitForLoggedInNav();
 
     await roles.waitForLoaded();
