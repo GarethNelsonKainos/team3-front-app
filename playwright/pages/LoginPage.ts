@@ -8,6 +8,7 @@ export class LoginPage {
   private readonly passwordInput: Locator;
   private readonly loginButton: Locator;
   private readonly signUpLink: Locator;
+  private readonly registrationMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -16,6 +17,7 @@ export class LoginPage {
     this.passwordInput = this.page.getByLabel('Password');
     this.loginButton = this.page.getByRole('button', { name: 'Log in' });
     this.signUpLink = this.page.getByRole('link', { name: 'Sign Up' });
+    this.registrationMessage = this.page.getByText('Registration successful. Please log in.');
   }
 
   async goto() {
@@ -40,5 +42,10 @@ export class LoginPage {
     await this.signUpLink.waitFor({ state: 'visible' });
     await this.signUpLink.click();
     await this.page.waitForURL(URL_PATTERNS.REGISTER);
+  }
+
+  async getSuccessMessage() {
+    await this.registrationMessage.waitFor({ state: 'visible' });
+    return this.registrationMessage.textContent();
   }
 }
