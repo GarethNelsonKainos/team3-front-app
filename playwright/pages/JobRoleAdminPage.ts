@@ -4,13 +4,13 @@ import { type Locator, type Page } from "@playwright/test";
 export class JobRoleAdminPage extends JobRolesPage {
     private readonly adminHeading : Locator
     private readonly applicationsTable: Locator
-    private readonly applicationLink: Locator
+    private readonly firstApplicationLink: Locator
 
     constructor(page: Page) {
         super(page)
         this.adminHeading = page.getByRole('heading', { name: 'Applications for this role' })
         this.applicationsTable = page.getByRole('columnheader', { name: 'Applicant' })
-        this.applicationLink = page.getByRole('cell').nth(0).getByRole('link').nth(0)
+        this.firstApplicationLink = page.getByRole('cell').nth(0).getByRole('link').nth(0)
     }
 
     async waitForLoaded() {
@@ -23,6 +23,6 @@ export class JobRoleAdminPage extends JobRolesPage {
     }
 
     async checkApplicationLinkExists() {
-        return await this.applicationLink.isVisible();
+        return await this.firstApplicationLink.isVisible();
     }
 }
