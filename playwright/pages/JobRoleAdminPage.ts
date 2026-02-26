@@ -10,7 +10,7 @@ export class JobRoleAdminPage extends JobRolesPage {
         super(page)
         this.adminHeading = page.getByRole('heading', { name: 'Applications for this role' })
         this.applicationsTable = page.getByRole('columnheader', { name: 'Applicant' })
-        this.applicationLink = page.getByRole('link', { name: 'testuser1772027802207@example' })
+        this.applicationLink = page.getByRole('cell').nth(0).getByRole('link').nth(0)
     }
 
     async waitForLoaded() {
