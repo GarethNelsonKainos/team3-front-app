@@ -23,7 +23,8 @@ test('complete applicant journey: registration to application submission', async
   await register.waitForLoaded();
 
   const uniqueEmail = `testuser${Date.now()}@example.com`;
-  await register.register(uniqueEmail, 'ValidPassword123!');
+  await register.fillRegisterInfo(uniqueEmail, 'ValidPassword123!');
+  await register.clickSignUp();
 
   await register.waitForLoginReady();
 
