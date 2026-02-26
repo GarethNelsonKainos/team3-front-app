@@ -59,4 +59,8 @@ export class JobRolesPage {
   async openFirstRole() {
     await this.openRoleByIndex(0);
   }
+
+  async waitForJobRoles() {
+    await this.roleRows.first().waitFor({ state: 'visible' });
+  } 
 }
