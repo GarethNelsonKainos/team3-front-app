@@ -10,6 +10,7 @@ export class LoginPage {
   private readonly loginButton: Locator;
   private readonly signUpLink: Locator;
   private readonly errorMessage: Locator;
+  private readonly registrationMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -19,6 +20,7 @@ export class LoginPage {
     this.passwordInput = this.page.getByLabel('Password');
     this.loginButton = this.page.getByRole('button', { name: 'Log in' });
     this.signUpLink = this.page.getByRole('link', { name: 'Sign Up' });
+    this.registrationMessage = this.page.getByText('Registration successful. Please log in.');
   }
 
   async goto() {
@@ -37,7 +39,10 @@ export class LoginPage {
     await this.page.waitForURL(URL_PATTERNS.JOB_ROLES);
   }
 }
-
+  async clickLoginButton() {
+    await this.loginButton.waitFor({ state: 'visible' });
+    await this.loginButton.click();
+  }
   async getEmailValidationMessage() {
     return await this.emailInput.evaluate((el: HTMLInputElement) => el.validationMessage);
   }
@@ -50,6 +55,10 @@ export class LoginPage {
   async assertErrorMessage(expectedMessage: string) {
     await this.errorMessage.waitFor({ state: 'visible' });
     await expect(this.errorMessage).toHaveText(new RegExp(expectedMessage));
+
+  async getSuccessMessage() {
+    await this.registrationMessage.waitFor({ state: 'visible' });
+    return this.registrationMessage.textContent();
   }
 }
 
