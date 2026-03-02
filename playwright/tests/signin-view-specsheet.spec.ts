@@ -11,6 +11,7 @@ test('applicant can sign in and view a job role information page', async ({ page
 
   await login.goto();
   await login.login(APPLICANT_CREDENTIALS.email, APPLICANT_CREDENTIALS.password);
+  await login.clickLoginButton();
   await roles.waitForLoaded();
 
   await roles.openFirstRole();

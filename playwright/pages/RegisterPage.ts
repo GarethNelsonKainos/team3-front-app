@@ -28,9 +28,12 @@ export class RegisterPage {
     await this.heading.waitFor({ state: 'visible' });
   }
 
-  async register(email: string, password: string) {
+  async fillRegisterInfo(email: string, password: string) {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
+  }
+
+  async clickSignUp() {
     await this.signUpButton.click();
   }
 
