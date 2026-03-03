@@ -46,7 +46,7 @@ jobs:
         fi
 
     - name: Login to Azure Container Registry
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      if: github.event_name == 'push'
       uses: docker/login-action@v3
       with:
         registry: ${{ secrets.ACR_LOGIN_SERVER }} # e.g. myregistry.azurecr.io
